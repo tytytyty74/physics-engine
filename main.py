@@ -1,6 +1,7 @@
 from rect import *
 from circle import *
 from multiprocessing import cpu_count
+import time
 from random import random
 import Tkinter
 shapes = []
@@ -43,7 +44,12 @@ def startCircle(event):
     else:
         for i in circleAtPos(event.x, event.y):
             i.debugPrint()
-
+def circleInvalid(circle):
+    retval = True
+    for i in shapes:
+        if line_length(circle.coords, i.coords)<= (circle.radius+i.radius):
+            retval = False
+    return retval
 def makeCircle(event):
     global x
     global y
@@ -52,11 +58,12 @@ def makeCircle(event):
         if createState:
             global circleId
             global shapes
-            circleId += 1
             retval = Circle(Vector2D(x, y), line_length(Vector2D(x, y), Vector2D(event.x, event.y)), True, circleId)
             #retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
             retval.velocity = Vector2D(0, 0)
-            shapes.append(retval)
+            if circleInvalid(retval):
+                circleId += 1
+                shapes.append(retval)
 
 def main():
     '''shapes = [Shape([Vector2D(0.0, 0.0), Vector2D(10.0, 0.0),
@@ -76,7 +83,11 @@ def main():
     #shapes[5].rotationForce = -2
     playing = True
     cores = cpu_count()
+    start_time = time.time()
+    x = 1  # displays the frame rate every 1 second
+    counter = 0
     while playing:
+        counter += 1
         coords = []
         for i in range(0, len(shapes)):
             shapes = shapes[i].frame(shapes, i)
@@ -88,6 +99,11 @@ def main():
             w.create_oval(params[0], params[1], params[2], params[3])
         playing = True
         w.update()
+        counter += 1
+        if (time.time() - start_time) > x:
+            print("FPS: ", counter / (time.time() - start_time))
+            counter = 0
+            start_time = time.time()
 
 root = Tkinter.Tk()
 root.bind("<Button-1>", startCircle)

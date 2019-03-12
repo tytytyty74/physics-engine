@@ -145,7 +145,7 @@ class Circle:
 
 
     def frame(self, shapes, exclude):
-        self.velocity.y += 0.001
+        self.velocity.y += 0.000001
         #self.move()
         collisions = []
         collisionPoints = []
