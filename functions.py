@@ -48,6 +48,8 @@ class Vector2D:
             raise TypeError("Can only multiply vectors and scalars (integers and floats), can only use dot product on \
             2 vectors")
         return retval
+    def __neg__(self):
+        return self*-1
 
 
 class Line:
@@ -69,6 +71,9 @@ class Collision:
     def __init__(self, collisionPoint, collided):
         self.collisionPoint = collisionPoint
         self.collided = collided
+
+def getMidpoint(a, b):
+    return Vector2D((a.x + b.x) / 2, (a.y + b.y) / 2)
 
 
 def triangle_area(a, b, c):
