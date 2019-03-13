@@ -16,7 +16,7 @@ class Circle:
     id = 0
     collidedWith = []
     density = .05
-
+    bounciness = 500
     def __init__(self, coords, radius, mass, dynamic, id):
         self.coords = coords
         self.radius = radius
@@ -56,6 +56,7 @@ class Circle:
         )
         velocity.y *= 1
         velocity.x *= 1
+
         return velocity
 
     '''def _rotational_collision_(self, shapes, collisions, collisionPoints, i, CoM, oldVelocity, oldVelocity2, otherCoM):
@@ -132,20 +133,25 @@ class Circle:
         retval[3] = self.coords.y+self.radius
         return retval
 
-    def checkNearestEdge(self):
-        loss = min(1500/self.mass, 1)
+    '''def checkNearestEdge(self):
+        loss = min(self.bounciness/self.mass, 1)
         #print(loss)
         #loss = 0.2
+        retval = True
         if (not (20 <= self.coords.x -self.radius) and self.velocity.x < 0) or \
                 (not (self.coords.x +self.radius <= 1180) and self.velocity.x > 0):
             self.velocity.x = -self.velocity.x * loss
+            retval = False
         elif (not (20 <= self.coords.y -self.radius ) and self.velocity.y < 0) or \
                 (not (self.coords.y + self.radius <= 780) and self.velocity.y > 0):
             self.velocity.y = -self.velocity.y * loss
+            retval = False
+        return retval'''
+    def checkNearestEdge(self):
+        return True
 
 
     def frame(self, shapes, exclude):
-        self.velocity.y += 0.000001
         #self.move()
         collisions = []
         collisionPoints = []
@@ -165,15 +171,26 @@ class Circle:
             shapes[collisions[i]].velocity = -self._translational_collision_(shapes, collisions, i, CoM)
             '''shapes[collisions[i]].rotationForce += self._rotational_collision_(shapes, collisions, collisionPoints, i,
                                                                               CoM, oldVelocity, oldVelocity2, otherCoM)'''
-        self.checkNearestEdge()
+        if len(collisions) == 0 and self.checkNearestEdge():
+            #self.velocity.y += 0.05
+            pass
         self.move()
         return shapes
     def debugPrint(self):
         print ("coords: "+str(self.coords))
         print ("velocity: "+str(self.velocity))
+        print ("mass: "+str(self.mass))
 
 
-
+class Line:
+    def __init__(self, x1, y1, x2, y2, arrow):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+        self.arrow = arrow
+    def getParams(self):
+        return [self.x1, self.y1, self.x2, self.y2, self.arrow]
 
 
 

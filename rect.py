@@ -2,7 +2,7 @@ from functions import *
 from math import acos, radians
 
 
-class Shape:
+class Rect:
     coords = [Vector2D(0.0, 0.0), Vector2D(0.0, 100.0), Vector2D(100.0, 100.0), Vector2D(100.0, 0.0)]
     velocity = Vector2D(0.0, 0.0)
     rotationForce = 0.0
@@ -141,6 +141,7 @@ class Shape:
                                                                               CoM, oldVelocity, oldVelocity2, otherCoM)
         self.move()
         return shapes
+
 
 
 
