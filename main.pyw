@@ -1,28 +1,44 @@
-from rect import *
-from enum import *
+import sys
+import math
+sys.stdout = open("mylog.txt", "w")
+sys.stderr = open("errors.txt", "w")
+# from rect import *
 from circle import *
-from multiprocessing import cpu_count
+import os
+# from multiprocessing import cpu_count
 import time
 from random import random
 
+
+class Enum:
+    dic = {}
+
+    def __init__(self, *args):
+        for i in range(0, len(args)):
+            self.dic[args[i]] = i
+
+    def __getitem__(self, item):
+        return self.dic[item]
+
+    def __getattr__(self, item):
+        return self.dic[item]
+
+
 try:
     import Tkinter
-    from enum import Enum
+
+    import cPickle as pickle
+    import tkFileDialog as filedialog
 except ModuleNotFoundError:
+    # import tkinter as Tkinter
+    from tkinter import filedialog
+    import pickle
     import tkinter as Tkinter
-    class Enum:
-        dic = {}
-        def __init__(self, *args):
-            for i in range(0, len(args)):
-                self.dic[args[i]] = i
 
-        def __getitem__(self, item):
-            return self.dic[item]
-
-        def __getattr__(self, item):
-            return self.dic[item]
 
 shapes = []
+width = 1200
+height = 800
 noPhysicsShapes = []
 lines = []
 mass = 10
@@ -37,13 +53,23 @@ x = 0
 y = 0
 mouseX = 0
 mouseY = 0
-active=True
+active = True
+running = True
+
+
+def close():
+    global running
+    # os.system("start start.cmd")
+    # os.system("start start.cmd")
+    running = False
+
 
 def destroy(event):
-    global active
-    active = False
+    global running
+    running = False
 
-def setCreate(event):
+
+def set_create(*args):
     global state
     state = States.create
 
@@ -53,22 +79,22 @@ def motion(event):
     mouseX, mouseY = event.x, event.y
 
 
-def setPush(event):
+def set_push(*args):
     global state
     state = States.push
 
 
-def setDelete(event):
+def set_delete(*args):
     global state
     state = States.delete
 
 
-def debug(event):
+def debug(*args):
     global state
     state = States.debug
 
 
-def circleAtPos(x, y):
+def circle_at_pos(x, y):
     retval = []
     for i in shapes:
         if abs(line_length(Vector2D(x, y), i.coords))<i.radius:
@@ -76,7 +102,7 @@ def circleAtPos(x, y):
     return retval
 
 
-def circleAtPos2(x, y):
+def circle_at_pos2(x, y):
     retval = []
     for i in range(0, len(shapes)):
         if abs(line_length(Vector2D(x, y), shapes[i].coords))<shapes[i].radius:
@@ -84,7 +110,7 @@ def circleAtPos2(x, y):
     return retval
 
 
-def startCircle(event):
+def start_circle(event):
     global click
     click = True
     global x
@@ -92,7 +118,7 @@ def startCircle(event):
     if state == States.create:
 
         global validShape
-        if (len(circleAtPos(event.x, event.y)) <= 0):
+        if len(circle_at_pos(event.x, event.y)) <= 0:
             validShape = True
         else:
             validShape = False
@@ -100,17 +126,16 @@ def startCircle(event):
         x = event.x
         y = event.y
     elif state == States.debug:
-        for i in circleAtPos(event.x, event.y):
+        for i in circle_at_pos(event.x, event.y):
             i.debugPrint()
     elif state == States.push:
         global shapeToMove
-        shapeToMove = circleAtPos2(event.x, event.y)
+        shapeToMove = circle_at_pos2(event.x, event.y)
         x = event.x
         y = event.y
 
 
-
-def circleInvalid(circle):
+def circle_invalid(circle):
     retval = None
     for i in shapes:
         if line_length(circle.coords, i.coords)<= (circle.radius+i.radius)+10:
@@ -118,11 +143,13 @@ def circleInvalid(circle):
     return retval
 
 
-def maxRadius(coords, radius, collision):
+def max_radius(coords, radius, collision):
     distance = line_length(coords, collision.coords)
     retval = distance-collision.radius-10
-    return(max(0, min(retval, radius)))
-def deleteShapes(index):
+    return max(0, min(retval, radius))
+
+
+def delete_shapes(index):
     global circleId
     for i in range(0, len(index)):
         del shapes[index[i]-i]
@@ -131,7 +158,7 @@ def deleteShapes(index):
     circleId = len(shapes)
 
 
-def nonPhysics():
+def non_physics():
     global noPhysicsShapes
     global lines
     noPhysicsShapes = []
@@ -142,44 +169,41 @@ def nonPhysics():
                 retval = Circle(Vector2D(x, y), line_length(Vector2D(x, y), Vector2D(mouseX, mouseY)), True, circleId)
                 # retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
                 retval.velocity = Vector2D(0, 0)
-                collision = circleInvalid(retval)
+                collision = circle_invalid(retval)
                 if collision:
-                    retval.radius = maxRadius(retval.coords, retval.radius, collision)
+                    retval.radius = max_radius(retval.coords, retval.radius, collision)
                 noPhysicsShapes.append(retval)
         elif state == States.push:
             lines.append(Line(x, y, mouseX, mouseY, Tkinter.LAST))
 
 
-
-
-
-
-def makeCircle(event):
+def make_circle(event):
     global click
     click = False
     global x
     global y
     global playing
     global circleId
+
     if state != States.debug:
         global shapes
         if state == States.create and x and y:
             if validShape:
                 retval = Circle(Vector2D(x, y), line_length(Vector2D(x, y), Vector2D(event.x, event.y)), True, circleId)
-                #retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
+                # retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
                 retval.velocity = Vector2D(0, 0)
-                collision = circleInvalid(retval)
+                collision = circle_invalid(retval)
                 if collision:
-                    retval.radius = maxRadius(retval.coords, retval.radius, collision)
+                    retval.radius = max_radius(retval.coords, retval.radius, collision)
                 if retval.radius >3:
                     circleId += 1
                     shapes.append(retval)
         elif state == States.delete:
             playing = False
-            index = circleAtPos2(event.x, event.y)
+            index = circle_at_pos2(event.x, event.y)
             while isPlaying:
                 time.sleep(0.001)
-            deleteShapes(index)
+            delete_shapes(index)
             playing = True
         elif state == States.push and x and y:
             scale = 0.1
@@ -187,11 +211,10 @@ def makeCircle(event):
                 shapes[i].velocity.x += (event.x-x)*scale
                 shapes[i].velocity.y += (event.y-y)*scale
 
-def toDelete(shape):
-    return shape.coords.x +shape.radius < 0 or shape.coords.x -shape.radius > 1200 or \
-        shape.coords.y + shape.radius < 0 or shape.coords.y - shape.radius > 800
 
-
+def to_delete(shape):
+    return shape.coords.x +shape.radius < 0 or shape.coords.x -shape.radius > width or \
+        shape.coords.y + shape.radius < 0 or shape.coords.y - shape.radius > height
 
 
 def main():
@@ -209,13 +232,13 @@ def main():
                      Vector2D(80.0, 200.0), Vector2D(70.0, 200.0)], 10, True, 5),
               ]'''
     global shapes
-    #shapes[5].rotationForce = -2
+    # shapes[5].rotationForce = -2
     global playing
     global isPlaying
     playing = True
-    cores = cpu_count()
+    # cores = cpu_count()
     startTime = time.time()
-    while active:
+    while running:
         if playing:
             isPlaying = True
             coords = []
@@ -224,20 +247,22 @@ def main():
                 coords.append(shapes[i])
             deleted = 0
             for i in range(0, len(shapes)):
-                if toDelete(shapes[i-deleted]):
+                if to_delete(shapes[i - deleted]):
                     print ("deleting")
-                    deleteShapes([i-deleted])
+                    delete_shapes([i - deleted])
                     deleted += 1
             isPlaying=False
-            w.delete("all")
-            for i in coords:
-                #w.create_polygon(i[0].x, i[0].y, i[1].x, i[1].y, i[2].x, i[2].y, i[3].x, i[3].y)
-                params = i.getParams()
-                w.create_oval(params[0], params[1], params[2], params[3])
-            #print(max(0.0, framerate-(time.time()-startTime)))
+
+            # print(max(0.0, framerate-(time.time()-startTime)))
+
             time.sleep(max(0.0, framerate-(time.time()-startTime)))
             startTime = time.time()
-        nonPhysics()
+        non_physics()
+        w.delete("all")
+        for i in shapes:
+            # w.create_polygon(i[0].x, i[0].y, i[1].x, i[1].y, i[2].x, i[2].y, i[3].x, i[3].y)
+            params = i.getParams()
+            w.create_oval(params[0], params[1], params[2], params[3])
         for i in noPhysicsShapes:
             params = i.getParams()
             w.create_oval(params[0], params[1], params[2], params[3])
@@ -247,19 +272,71 @@ def main():
         w.update()
     root.destroy()
 
+def toggle_play(event):
+    global playing
+    playing = not playing
 
+
+
+def resize(event):
+    global width
+    global height
+    width = event.width-4
+    height = event.height-4
+    w.configure(width=width, height=height)
+
+def saveShapes():
+    fileName = filedialog.asksaveasfilename(parent=root, title="Save As", filetypes=[("Saved Shapes File", "*.p")],
+                                            defaultextension="p")
+    if not fileName == "":
+        f = open(fileName, "w")
+        pickle.dump(shapes, f)
+        f.close()
+
+def loadShapes():
+    fileName = filedialog.askopenfilename(parent=root, title="Load", filetypes=[("Saved Shapes File", "*.p")],
+                                          defaultextension="p")
+    if not fileName == "":
+        global shapes
+        f = open(fileName)
+        shapes = pickle.load(f)
+        f.close()
+
+def test(event):
+    global fileMenu
+    fileMenu.post(mouseX, mouseY)
+print(sys.argv)
+print("hello world")
 root = Tkinter.Tk()
-root.attributes('-fullscreen', True)
+# root.attributes('-fullscreen', True)
 canvas = Vector2D(root.winfo_screenmmwidth(), root.winfo_screenheight())
-root.bind("<Button-1>", startCircle)
-root.bind("<ButtonRelease-1>", makeCircle)
+root.bind("<Button-1>", start_circle)
+root.bind("<ButtonRelease-1>", make_circle)
 root.bind("<Motion>", motion)
 root.bind("<Return>", debug)
 root.bind("<Escape>", destroy)
-root.bind("d", setDelete)
-root.bind("c", setCreate)
-root.bind("p", setPush)
-w = Tkinter.Canvas(root, width=1200, height=800)
+root.bind("d", set_delete)
+root.bind("c", set_create)
+root.bind("p", set_push)
+root.bind("<Configure>", resize)
+root.bind("<space>", toggle_play)
+root.bind("t", test)
+root.protocol("WM_DELETE_WINDOW", close)
+w = Tkinter.Canvas(root, width=width, height=height, )
 w.pack()
+menu = Tkinter.Menu(root)
+fileMenu = Tkinter.Menu(menu, tearoff=0)
+fileMenu.add_command(label="Save", command=saveShapes)
+fileMenu.add_command(label="Open", command=loadShapes)
+menu.add_cascade(label="File", menu=fileMenu)
+editMenu = Tkinter.Menu(menu, tearoff=0)
+editMenu.add_command(label="Create Circles", command=set_create)
+editMenu.add_command(label="Delete Circles", command=set_delete)
+editMenu.add_command(label="Change Circle Velocities", command=set_push)
+menu.add_cascade(label="Edit", menu=editMenu)
+root.config(menu=menu)
 root.after(17, main)
 root.mainloop()
+
+sys.stdout.close()
+sys.stderr.close()

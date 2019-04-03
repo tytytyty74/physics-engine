@@ -177,10 +177,10 @@ class Circle:
         self.move()
         return shapes
     def debugPrint(self):
-        print ("coords: "+str(self.coords))
-        print ("velocity: "+str(self.velocity))
-        print ("mass: "+str(self.mass))
-
+        pass
+        #print ("coords: "+str(self.coords))
+        #print ("velocity: "+str(self.velocity))
+        #print ("mass: "+str(self.mass))
 
 class Line:
     def __init__(self, x1, y1, x2, y2, arrow):
