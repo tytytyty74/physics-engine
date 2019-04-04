@@ -1,14 +1,15 @@
 import sys
 import math
-sys.stdout = open("mylog.txt", "w")
-sys.stderr = open("errors.txt", "w")
+# sys.stdout = open("mylog.txt", "w")
+# sys.stderr = open("errors.txt", "w")
 # from rect import *
 from circle import *
 import os
+import threading
 # from multiprocessing import cpu_count
 import time
 from random import random
-
+import json
 
 class Enum:
     dic = {}
@@ -26,16 +27,26 @@ class Enum:
 
 try:
     import Tkinter
-
     import cPickle as pickle
     import tkFileDialog as filedialog
+    import tkMessageBox as messagebox
+    import tkColorChooser as colorchooser
+    import tkSimpleDialog as simpledialog
 except ModuleNotFoundError:
-    # import tkinter as Tkinter
-    from tkinter import filedialog
-    import pickle
     import tkinter as Tkinter
+    import pickle
+    from tkinter import filedialog
+    from tkinter import messagebox
+    from tkinter import colorchooser
+    from tkinter import simpledialog
 
 
+defaultJson = '''{  
+   "delete":"d",
+   "create":"c",
+   "push":"p",
+   "pause":"<space>"
+}'''
 shapes = []
 width = 1200
 height = 800
@@ -53,8 +64,11 @@ x = 0
 y = 0
 mouseX = 0
 mouseY = 0
+globalX = 0
+globalY = 0
 active = True
 running = True
+color = "white"
 
 
 def close():
@@ -75,8 +89,9 @@ def set_create(*args):
 
 
 def motion(event):
-    global mouseX, mouseY
+    global mouseX, mouseY, globalX, globalY
     mouseX, mouseY = event.x, event.y
+    globalX, globalY = root.winfo_pointerx() - root.winfo_vrootx(), root.winfo_pointery() - root.winfo_vrooty()
 
 
 def set_push(*args):
@@ -136,17 +151,23 @@ def start_circle(event):
 
 
 def circle_invalid(circle):
-    retval = None
+    retval = []
     for i in shapes:
         if line_length(circle.coords, i.coords)<= (circle.radius+i.radius)+10:
-            retval = i
+            retval.append(i)
     return retval
 
 
 def max_radius(coords, radius, collision):
-    distance = line_length(coords, collision.coords)
-    retval = distance-collision.radius-10
-    return max(0, min(retval, radius))
+    closest = collision[0]
+    smallestdist=line_length(coords, collision[0].coords)-collision[0].radius
+    for i in collision:
+        if line_length(coords, i.coords)-i.radius<smallestdist:
+            smallestdist=line_length(coords, i.coords)-i.radius
+            closest=i
+    distance = line_length(coords, closest.coords)
+    retval = distance-closest.radius-10
+    return min(retval, radius)
 
 
 def delete_shapes(index):
@@ -166,11 +187,12 @@ def non_physics():
     if click:
         if state == States.create:
             if validShape:
-                retval = Circle(Vector2D(x, y), line_length(Vector2D(x, y), Vector2D(mouseX, mouseY)), True, circleId)
+                retval = Circle(Vector2D(x, y), line_length(Vector2D(x, y), Vector2D(mouseX, mouseY)), True, circleId,
+                                color=color)
                 # retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
                 retval.velocity = Vector2D(0, 0)
                 collision = circle_invalid(retval)
-                if collision:
+                if len(collision)>0:
                     retval.radius = max_radius(retval.coords, retval.radius, collision)
                 noPhysicsShapes.append(retval)
         elif state == States.push:
@@ -189,11 +211,12 @@ def make_circle(event):
         global shapes
         if state == States.create and x and y:
             if validShape:
-                retval = Circle(Vector2D(x, y), line_length(Vector2D(x, y), Vector2D(event.x, event.y)), True, circleId)
+                retval = Circle(Vector2D(x, y), line_length(Vector2D(x, y), Vector2D(event.x, event.y)), True, circleId,
+                                color=color)
                 # retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
                 retval.velocity = Vector2D(0, 0)
                 collision = circle_invalid(retval)
-                if collision:
+                if len(collision)>0:
                     retval.radius = max_radius(retval.coords, retval.radius, collision)
                 if retval.radius >3:
                     circleId += 1
@@ -262,19 +285,21 @@ def main():
         for i in shapes:
             # w.create_polygon(i[0].x, i[0].y, i[1].x, i[1].y, i[2].x, i[2].y, i[3].x, i[3].y)
             params = i.getParams()
-            w.create_oval(params[0], params[1], params[2], params[3])
+            w.create_oval(params[0], params[1], params[2], params[3], fill=i.color)
         for i in noPhysicsShapes:
             params = i.getParams()
-            w.create_oval(params[0], params[1], params[2], params[3])
+            w.create_oval(params[0], params[1], params[2], params[3], fill=i.color)
         for i in lines:
             params = i.getParams()
             w.create_line(params[0], params[1], params[2], params[3], arrow=params[4])
         w.update()
     root.destroy()
+    sys.exit()
 
-def toggle_play(event):
+def toggle_play(event=None):
     global playing
     playing = not playing
+    print (playing)
 
 
 
@@ -289,38 +314,178 @@ def saveShapes():
     fileName = filedialog.asksaveasfilename(parent=root, title="Save As", filetypes=[("Saved Shapes File", "*.p")],
                                             defaultextension="p")
     if not fileName == "":
-        f = open(fileName, "w")
+        f = open(fileName, "wb")
         pickle.dump(shapes, f)
         f.close()
+
 
 def loadShapes():
     fileName = filedialog.askopenfilename(parent=root, title="Load", filetypes=[("Saved Shapes File", "*.p")],
                                           defaultextension="p")
     if not fileName == "":
         global shapes
-        f = open(fileName)
+        f = open(fileName, "rb")
         shapes = pickle.load(f)
         f.close()
 
-def test(event):
-    global fileMenu
-    fileMenu.post(mouseX, mouseY)
+
+def newCircle(xVal, yVal):
+    radius = simpledialog.askinteger("Radius", "What should the radius be?", parent=root, minvalue=3)
+    if radius is not None:
+        global circleId
+        retval = Circle(Vector2D(xVal, yVal), radius, True, circleId,color=color)
+        # retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
+        retval.velocity = Vector2D(0, 0)
+        collision = circle_invalid(retval)
+        if len(collision)>0:
+            retval.radius = max_radius(retval.coords, retval.radius, collision)
+        if retval.radius > 3:
+            circleId += 1
+            shapes.append(retval)
+
+
+def test(event=None):
+    pass
+
+
+def changeColor(change):
+    global shapes
+    newColor = (colorchooser.askcolor(title="Pick a new color", parent=root))
+    for i in change:
+        shapes[i].color = newColor[1]
+
+def stop(circles):
+    global shapes
+    for i in circles:
+        shapes[i].velocity = Vector2D(0.0, 0.0)
+
+def right_click(event):
+    global playing
+    playing = False
+    clicked = circle_at_pos2(event.x, event.y)
+    if len(clicked)==0:
+        emptySpotMenu = Tkinter.Menu(tearoff=0)
+        emptySpotMenu.add_command(label="New Circle", command=lambda: newCircle(event.x, event.y))
+        emptySpotMenu.post(globalX, globalY)
+    else:
+        rightClickMenu = Tkinter.Menu()
+        rightClickMenu.add_command(label="Delete Circle", command=lambda: delete_shapes(clicked))
+        rightClickMenu.add_command(label="Change Color", command=lambda: changeColor(clicked))
+        rightClickMenu.add_command(label="Stop Shape", command=lambda: stop(clicked))
+        rightClickMenu.post(globalX, globalY)
+
+
+def shortcutMenu():
+
+    buttons = []
+    shortcutStates = Enum("create", "delete", "push", "pause", "none")
+    currentState = shortcutStates.none
+    currentIndex = 10
+
+    def activateButton(state, index):
+        global currentState
+        global currentIndex
+        currentState = state
+        currentIndex = index
+        newRoot.bind("<Key>", changeVal)
+
+
+    def changeVal(event):
+        global shortcuts
+        global currentIndex
+        global currentState
+        # global buttons
+        buttons[currentIndex].config(text=event.keysym)
+        try:
+            newRoot.bind("<" + event.keysym + ">", test)
+            newRoot.unbind("<" + event.keysym + ">")
+            messagebox.showinfo("info", "test 2 success")
+            shortcuts[currentState] = "<" + event.keysym + ">"
+            f = open("shortcuts.json", "w")
+            json.dump(shortcuts, f)
+            f.close()
+        except:
+            try:
+                newRoot.bind(event.keysym, test)
+                newRoot.unbind(event.keysym)
+                messagebox.showinfo(str(currentState), "test 1 success")
+                shortcuts[str(currentState)] = event.keysym
+                f = open("shortcuts.json", "w")
+                json.dump(shortcuts, f)
+                f.close()
+            except:
+                messagebox.showerror("error", "not a valid key")
+
+        currentIndex=10
+        currentState=shortcutStates.none
+
+
+    newRoot = Tkinter.Tk()
+    Tkinter.Label(newRoot, text="Change Keyboard Shortcuts").grid(row=0, column=0, columnspan=2)
+    Tkinter.Label(newRoot, text="Create Circles").grid(row=1, column=0)
+    Tkinter.Label(newRoot, text="Push Circles").grid(row=2, column=0)
+    Tkinter.Label(newRoot, text="Delete Circles").grid(row=3, column=0)
+    Tkinter.Label(newRoot, text="Toggle Pause/Play").grid(row=4, column=0)
+    buttons.append(Tkinter.Button(newRoot, text=shortcuts["create"],
+                                  command=lambda: activateButton("create", 0)))
+    buttons.append(Tkinter.Button(newRoot, text=shortcuts["push"],
+                                  command=lambda: activateButton("push", 1)))
+    buttons.append(Tkinter.Button(newRoot, text=shortcuts["delete"],
+                                  command=lambda: activateButton("delete", 2)))
+    buttons.append(Tkinter.Button(newRoot, text=shortcuts["pause"],
+                                  command=lambda: activateButton("pause", 3)))
+    for i in range(0, len(buttons)):
+        buttons[i].grid(row=i+1, column=1)
+    newRoot.protocol("WM_DELETE_WINDOW", newRoot.destroy)
+    print("hello 2")
+
+
+
 print(sys.argv)
 print("hello world")
-root = Tkinter.Tk()
 # root.attributes('-fullscreen', True)
+temp = Tkinter.Tk()
+temp.withdraw()
+try:
+    f = open("shortcuts.json", "r")
+    shortcuts = json.load(f)
+    f.close()
+    if shortcuts["delete"] and shortcuts["create"] and shortcuts["push"] and shortcuts["pause"]:
+        pass
+    for i in shortcuts.values():
+        temp.bind(i, test)
+except:
+    try:
+        f.close()
+    except:
+        pass
+    result = messagebox.askyesno("Error", "Your Shortcuts file appears to be corrupted, would you like to recreate "
+                                             "the default one?", icon="error", parent=temp)
+    print (result)
+    if result:
+        f=open("shortcuts.json", "w")
+        f.write(defaultJson)
+        f.close()
+        shortcuts = json.loads(defaultJson)
+    else:
+        messagebox.showinfo("Error", "the program will not function until the shortcuts file has been fixed")
+        sys.exit()
+
+
+root = Tkinter.Tk()
 canvas = Vector2D(root.winfo_screenmmwidth(), root.winfo_screenheight())
 root.bind("<Button-1>", start_circle)
 root.bind("<ButtonRelease-1>", make_circle)
 root.bind("<Motion>", motion)
-root.bind("<Return>", debug)
-root.bind("<Escape>", destroy)
-root.bind("d", set_delete)
-root.bind("c", set_create)
-root.bind("p", set_push)
+# root.bind("<Return>", debug)
+# root.bind("<Escape>", destroy)
+root.bind(shortcuts["delete"], set_delete)
+root.bind(shortcuts["create"], set_create)
+root.bind(shortcuts["push"], set_push)
 root.bind("<Configure>", resize)
-root.bind("<space>", toggle_play)
-root.bind("t", test)
+root.bind(shortcuts["pause"], toggle_play)
+root.bind("<ButtonRelease-3>", right_click)
+# root.bind("t", test)
 root.protocol("WM_DELETE_WINDOW", close)
 w = Tkinter.Canvas(root, width=width, height=height, )
 w.pack()
@@ -333,7 +498,10 @@ editMenu = Tkinter.Menu(menu, tearoff=0)
 editMenu.add_command(label="Create Circles", command=set_create)
 editMenu.add_command(label="Delete Circles", command=set_delete)
 editMenu.add_command(label="Change Circle Velocities", command=set_push)
+editMenu.add_separator()
+editMenu.add_command(label="Edit Shortcuts", command=shortcutMenu)
 menu.add_cascade(label="Edit", menu=editMenu)
+menu.add_command(label="Pause/Play", command=toggle_play)
 root.config(menu=menu)
 root.after(17, main)
 root.mainloop()

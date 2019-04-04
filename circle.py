@@ -17,19 +17,23 @@ class Circle:
     collidedWith = []
     density = .05
     bounciness = 500
-    def __init__(self, coords, radius, mass, dynamic, id):
+    color = "white"
+
+    def __init__(self, coords, radius, mass, dynamic, id, color="white"):
         self.coords = coords
         self.radius = radius
         self.mass = mass
         self.dynamic = dynamic
         self.id = id
+        self.color = color
 
-    def __init__(self, coords, radius, dynamic, id):
+    def __init__(self, coords, radius, dynamic, id, color="white"):
         self.coords = coords
         self.radius = radius
         self.mass = self.density*pi*radius**2
         self.dynamic = dynamic
         self.id = id
+        self.color = color
 
     def _translational_collision_(self, shapes, collisions, i, CoM):
         otherCoM = shapes[collisions[i]].oldCoords

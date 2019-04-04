@@ -1,0 +1,6 @@
+{  
+   "delete":"d",
+   "create":"c",
+   "push":"p",
+   "pause":"<space>"
+}
