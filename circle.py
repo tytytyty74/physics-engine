@@ -2,6 +2,22 @@ from functions import *
 from math import acos, radians, pi
 
 
+
+'''
+********************************************************************************
+
+    Class: Circle
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+'''
 class Circle:
     coords = Vector2D(0.0, 0.0)
     oldCoords = Vector2D(0.0, 0.0)
@@ -19,6 +35,21 @@ class Circle:
     bounciness = 500
     color = "white"
 
+    '''
+********************************************************************************
+
+    Function: __init__
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+    '''
     def __init__(self, coords, radius, mass, dynamic, id, color="white"):
         self.coords = coords
         self.radius = radius
@@ -27,6 +58,21 @@ class Circle:
         self.id = id
         self.color = color
 
+    '''
+********************************************************************************
+
+    Function: __init__
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+    '''
     def __init__(self, coords, radius, dynamic, id, color="white"):
         self.coords = coords
         self.radius = radius
@@ -34,7 +80,22 @@ class Circle:
         self.dynamic = dynamic
         self.id = id
         self.color = color
+    
+    '''
+********************************************************************************
 
+    Function: _translational_collision_
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+    '''
     def _translational_collision_(self, shapes, collisions, i, CoM):
         otherCoM = shapes[collisions[i]].oldCoords
         oldVelocity = self.velocity
@@ -95,19 +156,48 @@ class Circle:
         w = line_length(shapes[collisions[i]].coords[1], shapes[collisions[i]].coords[2])
         inertia = (1.0/12.0)*shapes[collisions[i]].mass*(h**2+w**2)
         return (tau/inertia/60)'''
+
+    '''
+********************************************************************************
+
+    Function: move
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+    '''
     def move(self):
         if self.dynamic:
             self.coords= (self.coords + self.velocity)
         else:
             self.rotationForce = 0
             self.velocity = Vector2D(0, 0)
+    
+    '''
+********************************************************************************
 
+    Function: check_collider
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+    '''
     def check_collider(self, collider):
         #return False
         return Collision(getMidpoint(self.coords, collider.coords),
                          line_length(self.coords, collider.coords)<= (self.radius+collider.radius))
-
-
 
     '''def findLines(self):
         for i in range(0, 3):
@@ -128,16 +218,7 @@ class Circle:
             if dists[i] < smallest:
                 smallest = dists[i]
                 retval = i
-        return self.lines[retval]'''
-    def getParams(self):
-        retval =[0, 0, 0, 0]
-        retval[0] = self.coords.x-self.radius
-        retval[1] = self.coords.y-self.radius
-        retval[2] = self.coords.x+self.radius
-        retval[3] = self.coords.y+self.radius
-        return retval
-
-    '''def checkNearestEdge(self):
+        return self.lines[retval]def checkNearestEdge(self):
         loss = min(self.bounciness/self.mass, 1)
         #print(loss)
         #loss = 0.2
@@ -151,10 +232,40 @@ class Circle:
             self.velocity.y = -self.velocity.y * loss
             retval = False
         return retval'''
+
+    '''
+********************************************************************************
+
+    Function: checkNearestEdge
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+    '''
     def checkNearestEdge(self):
         return True
 
+    '''
+********************************************************************************
 
+    Function: frame
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+    '''
     def frame(self, shapes, exclude):
         #self.move()
         collisions = []
@@ -180,21 +291,82 @@ class Circle:
             pass
         self.move()
         return shapes
+
+    '''
+********************************************************************************
+
+    Function: debugPrint
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+    '''
     def debugPrint(self):
         pass
         #print ("coords: "+str(self.coords))
         #print ("velocity: "+str(self.velocity))
         #print ("mass: "+str(self.mass))
 
+
+'''
+********************************************************************************
+
+    Class: Line
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+'''
 class Line:
+    
+    '''
+********************************************************************************
+
+    Function: __init__
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+    '''
     def __init__(self, x1, y1, x2, y2, arrow):
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
         self.y2 = y2
         self.arrow = arrow
+
+    '''
+********************************************************************************
+
+    Function: getParams
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-5-2019
+
+    History:
+
+********************************************************************************
+    '''
     def getParams(self):
         return [self.x1, self.y1, self.x2, self.y2, self.arrow]
-
-
-

@@ -2,6 +2,7 @@ from functions import *
 from math import acos, radians
 
 
+
 class Rect:
     coords = [Vector2D(0.0, 0.0), Vector2D(0.0, 100.0), Vector2D(100.0, 100.0), Vector2D(100.0, 0.0)]
     velocity = Vector2D(0.0, 0.0)
@@ -13,6 +14,9 @@ class Rect:
     id = 0
     collidedWith = []
 
+
+
+    
     def __init__(self, coords, mass, dynamic, id):
         if len(coords) != 4:
             raise ValueError("coords must have a length of 4")
@@ -21,6 +25,9 @@ class Rect:
         self.dynamic = dynamic
         self.id = id
 
+
+
+    
     def _translational_collision_(self, shapes, collisions, i, CoM):
         otherCoM = getCoM(shapes[collisions[i]].coords)
         oldVelocity = self.velocity
@@ -43,6 +50,9 @@ class Rect:
         )
         return velocity
 
+
+
+    
     def _rotational_collision_(self, shapes, collisions, collisionPoints, i, CoM, oldVelocity, oldVelocity2, otherCoM):
         #return 0
         f = (self.mass * float(self.velocity - oldVelocity)) * 60
@@ -76,6 +86,9 @@ class Rect:
         inertia = (1.0/12.0)*shapes[collisions[i]].mass*(h**2+w**2)
         return (tau/inertia/60)
 
+
+
+    
     def move(self):
         if self.dynamic:
             for i in range(0, len(self.coords)):
@@ -85,6 +98,9 @@ class Rect:
             self.rotationForce = 0
             self.velocity = Vector2D(0, 0)
 
+
+
+    
     def check_collider(self, collider):
         retval = Collision(Vector2D(0, 0), False)
         Ccoords = collider.coords
@@ -100,6 +116,9 @@ class Rect:
                 retval = Collision(self.coords[i], True)
         return retval
 
+
+
+    
     def findLines(self):
         for i in range(0, 3):
             if i < 3:
@@ -108,6 +127,9 @@ class Rect:
                 j = 0
             self.lines.append(Line(self.coords[i], self.coords[j]))
 
+
+
+    
     def get_nearest_edge(self, point):
         self.findLines()
         dists = []
@@ -121,6 +143,9 @@ class Rect:
                 retval = i
         return self.lines[retval]
 
+
+
+    
     def frame(self, shapes, exclude):
         #self.move()
         collisions = []
