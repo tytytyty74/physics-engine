@@ -126,7 +126,12 @@ class Vector2D:
             raise TypeError("Can only add vectors with vectors")
         return retval
 
-
+    def __eq__(self, b):
+        retval = False
+        if isinstance(b, Vector2D):
+            if self.x == b.x and self.y == b.y:
+                retval = True
+        return retval
     '''
 ********************************************************************************
 

@@ -3,6 +3,7 @@ from math import acos, radians, pi
 
 
 
+
 '''
 ********************************************************************************
 
@@ -12,7 +13,7 @@ from math import acos, radians, pi
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 
@@ -35,6 +36,7 @@ class Circle:
     bounciness = 500
     color = "white"
 
+
     '''
 ********************************************************************************
 
@@ -44,7 +46,7 @@ class Circle:
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 
@@ -58,6 +60,7 @@ class Circle:
         self.id = id
         self.color = color
 
+
     '''
 ********************************************************************************
 
@@ -67,7 +70,7 @@ class Circle:
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 
@@ -81,6 +84,7 @@ class Circle:
         self.id = id
         self.color = color
     
+
     '''
 ********************************************************************************
 
@@ -90,7 +94,7 @@ class Circle:
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 
@@ -100,27 +104,47 @@ class Circle:
         otherCoM = shapes[collisions[i]].oldCoords
         oldVelocity = self.velocity
         oldVelocity2 = shapes[collisions[i]].velocity
-        velocityP1 = ((2 * shapes[collisions[i]].mass) / (self.mass + shapes[collisions[i]].mass))
+        '''velocityP1 = ((2 * shapes[collisions[i]].mass) / (self.mass + shapes[collisions[i]].mass))
         velocityP1 = (((self.velocity - shapes[collisions[i]].velocity) * (CoM - otherCoM)) / float(CoM - otherCoM) ** 2)
-        velocityP1 = (CoM - otherCoM)
-        velocity = (
+        velocityP1 = (CoM - otherCoM)'''
+        '''velocity = (
                 self.oldVelocity -
                 (CoM - otherCoM)
                 * ((2 * shapes[collisions[i]].mass) / (self.mass + shapes[collisions[i]].mass))
                 * (((self.oldVelocity - shapes[collisions[i]].oldVelocity) * (CoM - otherCoM)) / float(CoM - otherCoM) ** 2)
+        )'''
+        vX = (oldVelocity.x*(self.mass-shapes[collisions[i]].mass)+(2*shapes[collisions[i]].mass*oldVelocity2.x))/(
+            self.mass+shapes[collisions[i]].mass
         )
+        vY = (oldVelocity.y*(self.mass-shapes[collisions[i]].mass)+(2*shapes[collisions[i]].mass*oldVelocity2.y))/(
+            self.mass+shapes[collisions[i]].mass
+        )
+        velocity = Vector2D(vX, vY)
         self.velocity = velocity
         velocity.y *= 1
         velocity.x *= 1
 
-        velocity = (
+        '''velocity = (
                 shapes[collisions[i]].oldVelocity -
                 (otherCoM - CoM)
                 * ((2 * self.mass) / (self.mass + shapes[collisions[i]].mass))
                 * (((shapes[collisions[i]].oldVelocity - self.oldVelocity) * (otherCoM - CoM)) / float(otherCoM - CoM) ** 2)
-        )
+        )'''
+        vX = (oldVelocity2.x * (shapes[collisions[i]].mass - self.mass) + (
+                    2 * self.mass * oldVelocity.x)) / (
+                     self.mass + shapes[collisions[i]].mass
+             )
+        vY = (oldVelocity2.y * (shapes[collisions[i]].mass - self.mass) + (
+                    2 * self.mass * oldVelocity.y)) / (
+                    self.mass + shapes[collisions[i]].mass
+             )
+        velocity = Vector2D(vX, vY)
         velocity.y *= 1
         velocity.x *= 1
+
+        '''if velocity == Vector2D(0, 0) and self.velocity == Vector2D(0, 0):
+            self.velocity = (self.coords-shapes[collisions[i]].coords)*(1/self.radius)
+            velocity = (shapes[collisions[i]].coords-self.coords)*(1/shapes[collisions[i]].radius)'''
 
         return velocity
 
@@ -157,6 +181,7 @@ class Circle:
         inertia = (1.0/12.0)*shapes[collisions[i]].mass*(h**2+w**2)
         return (tau/inertia/60)'''
 
+
     '''
 ********************************************************************************
 
@@ -166,7 +191,7 @@ class Circle:
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 
@@ -179,6 +204,7 @@ class Circle:
             self.rotationForce = 0
             self.velocity = Vector2D(0, 0)
     
+
     '''
 ********************************************************************************
 
@@ -188,7 +214,7 @@ class Circle:
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 
@@ -207,7 +233,22 @@ class Circle:
                 j = 0
             self.lines.append(Line(self.coords[i], self.coords[j]))'''
 
-    '''def get_nearest_edge(self, point):
+    '''
+********************************************************************************
+
+    Function: get_nearest_edge
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-29-2019
+
+    History:
+
+********************************************************************************
+    '''
+    def get_nearest_edge(self, point):
         self.findLines()
         dists = []
         retval = 0
@@ -218,20 +259,31 @@ class Circle:
             if dists[i] < smallest:
                 smallest = dists[i]
                 retval = i
-        return self.lines[retval]def checkNearestEdge(self):
-        loss = min(self.bounciness/self.mass, 1)
-        #print(loss)
-        #loss = 0.2
-        retval = True
-        if (not (20 <= self.coords.x -self.radius) and self.velocity.x < 0) or \
-                (not (self.coords.x +self.radius <= 1180) and self.velocity.x > 0):
-            self.velocity.x = -self.velocity.x * loss
-            retval = False
-        elif (not (20 <= self.coords.y -self.radius ) and self.velocity.y < 0) or \
-                (not (self.coords.y + self.radius <= 780) and self.velocity.y > 0):
-            self.velocity.y = -self.velocity.y * loss
-            retval = False
-        return retval'''
+        return self.lines[retval]
+    '''
+********************************************************************************
+
+    Function: getParams
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-29-2019
+
+    History:
+
+********************************************************************************
+    '''
+    def getParams(self):
+        retval =[0, 0, 0, 0]
+        retval[0] = self.coords.x-self.radius
+        retval[1] = self.coords.y-self.radius
+        retval[2] = self.coords.x+self.radius
+        retval[3] = self.coords.y+self.radius
+        return retval
+
+
 
     '''
 ********************************************************************************
@@ -242,14 +294,46 @@ class Circle:
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 
 ********************************************************************************
     '''
-    def checkNearestEdge(self):
-        return True
+    def checkNearestEdge(self, width, height):
+
+        loss = min(self.bounciness/self.mass, 1)
+        #print(loss)
+        #loss = 0.2
+        retval = True
+        if (not (0 <= self.coords.x -self.radius) and self.velocity.x < 0) or \
+                (not (self.coords.x +self.radius <= width) and self.velocity.x > 0):
+            self.velocity.x = -self.velocity.x
+            retval = False
+        elif (not (0 <= self.coords.y -self.radius ) and self.velocity.y < 0) or \
+                (not (self.coords.y + self.radius <= height) and self.velocity.y > 0):
+            self.velocity.y = -self.velocity.y
+            retval = False
+        return retval
+
+
+    '''
+********************************************************************************
+
+    Function: checkNearestEdge
+
+    Definition:
+
+    Author: Tyler Silva
+
+    Date: 4-29-2019
+
+    History:
+
+********************************************************************************
+    '''
+
+
 
     '''
 ********************************************************************************
@@ -260,13 +344,13 @@ class Circle:
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 
 ********************************************************************************
     '''
-    def frame(self, shapes, exclude):
+    def frame(self, shapes, exclude, width, height):
         #self.move()
         collisions = []
         collisionPoints = []
@@ -286,11 +370,11 @@ class Circle:
             shapes[collisions[i]].velocity = -self._translational_collision_(shapes, collisions, i, CoM)
             '''shapes[collisions[i]].rotationForce += self._rotational_collision_(shapes, collisions, collisionPoints, i,
                                                                               CoM, oldVelocity, oldVelocity2, otherCoM)'''
-        if len(collisions) == 0 and self.checkNearestEdge():
+        if len(collisions) == 0 and self.checkNearestEdge(width, height):
             #self.velocity.y += 0.05
             pass
-        self.move()
         return shapes
+
 
     '''
 ********************************************************************************
@@ -301,7 +385,7 @@ class Circle:
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 
@@ -314,6 +398,7 @@ class Circle:
         #print ("mass: "+str(self.mass))
 
 
+
 '''
 ********************************************************************************
 
@@ -323,7 +408,7 @@ class Circle:
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 
@@ -331,6 +416,7 @@ class Circle:
 '''
 class Line:
     
+
     '''
 ********************************************************************************
 
@@ -340,7 +426,7 @@ class Line:
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 
@@ -353,6 +439,7 @@ class Line:
         self.y2 = y2
         self.arrow = arrow
 
+
     '''
 ********************************************************************************
 
@@ -362,7 +449,7 @@ class Line:
 
     Author: Tyler Silva
 
-    Date: 4-5-2019
+    Date: 4-29-2019
 
     History:
 

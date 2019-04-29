@@ -341,6 +341,28 @@ def resize(event):
     w.configure(width=width, height=height)
 
 #=============================  Circle Functions  ==============================
+def precise_circle():
+    x = simpledialog.askinteger("Coords", "X coordinate", minvalue=0, maxvalue=width, parent=root)
+    y = simpledialog.askinteger("Coords", "Y coordinate", minvalue=0, maxvalue=height, parent=root, initialvalue=300)
+    radius = simpledialog.askinteger("Radius", "Radius", parent=root, minvalue=3, initialvalue=50)
+    Vx = simpledialog.askfloat("Velocity", "X Velocity", minvalue=0, parent=root, initialvalue=0)
+    Vy = simpledialog.askfloat("Velocity", "Y Velocity", minvalue=0, parent=root, initialvalue=0)
+    if not (x is None or y is None or radius is None or Vx is None or Vy is None):
+        global circleId
+        retval = Circle(Vector2D(x, y), radius, True, circleId, color=color)
+        # retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
+        vel = Vector2D(Vx, Vy)
+        retval.velocity = vel
+        collision = circle_invalid(retval, 2)
+        if len(collision) > 0:
+            messagebox.showinfo("Error", "Cannot place a circle, position requested is obstructed.",
+                                icon="error", parent=temp)
+        else:
+            circleId += 1
+            shapes.append(retval)
+
+
+
 
 '''
 ********************************************************************************
@@ -402,10 +424,10 @@ def circle_at_pos2(x, y):
 
 ********************************************************************************
 '''
-def circle_invalid(circle):
+def circle_invalid(circle, error=10):
     retval = []
     for i in shapes:
-        if line_length(circle.coords, i.coords)<= (circle.radius+i.radius)+10:
+        if line_length(circle.coords, i.coords)<= (circle.radius+i.radius)+error:
             retval.append(i)
     return retval
 
@@ -945,9 +967,12 @@ def main():
             isPlaying = True
             coords = []
             for i in range(0, len(shapes)):
-                shapes = shapes[i].frame(shapes, i)
+                shapes = shapes[i].frame(shapes, i, width, height)
                 coords.append(shapes[i])
+                #shapes[i].move()
             deleted = 0
+            for i in shapes:
+                i.move()
             for i in range(0, len(shapes)):
                 if to_delete(shapes[i - deleted]):
                     print ("deleting")
@@ -1004,7 +1029,8 @@ except:
         f.close()
         shortcuts = json.loads(defaultJson)
     else:
-        messagebox.showinfo("Error", "the program will not function until the shortcuts file has been fixed")
+        messagebox.showinfo("Error", "the program will not function until the shortcuts file has been fixed",
+                            icon="error", parent=temp)
         sys.exit()
 
 
@@ -1038,6 +1064,9 @@ editMenu.add_command(label="Move Circles", command=set_move)
 editMenu.add_separator()
 editMenu.add_command(label="Edit Shortcuts", command=shortcutMenu)
 menu.add_cascade(label="Edit", menu=editMenu)
+createMenu = Tkinter.Menu(menu, tearoff=0)
+createMenu.add_command(label="Create Precise Circle", command=precise_circle)
+menu.add_cascade(label="Create", menu=createMenu)
 menu.add_command(label="Pause/Play", command=toggle_play)
 root.config(menu=menu)
 root.after(17, main)
