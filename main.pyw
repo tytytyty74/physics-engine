@@ -115,6 +115,10 @@ noPhysicsShapes = []
 lines = []
 mass = 10
 circleId = 0
+secrets = ["You think this is just a game?", "Getting rid of me won't be that easy.", "Keep trying all you like.",
+           "You know the definition of insanity, right?",
+           "Doing the same thing over and over and expecting different results", "Keep wasting your time"]
+counter = 0
 States = Enum("debug", "create", "delete", "push", "move", "none")
 state = States.none
 validShape = False
@@ -254,7 +258,19 @@ def set_move(*args):
 ********************************************************************************
 '''
 def test(event=None):
-    pass
+    root.overrideredirect(True)
+    #root.geometry("+250+250")
+    root.lift()
+    root.wm_attributes("-topmost", True)
+    #root.wm_attributes("-disabled", True)
+    root.wm_attributes("-transparentcolor", "white")
+    root.config(menu = Tkinter.Menu(root))
+    root.unbind(shortcuts["delete"])
+    root.unbind(shortcuts["create"])
+    root.unbind(shortcuts["push"])
+    root.unbind(shortcuts["pause"])
+    root.attributes("-fullscreen", True)
+#    root.wm_attributes("-transparentcolor", "black")
 
 
 '''
@@ -274,6 +290,12 @@ def test(event=None):
 '''
 def destroy(*args):
     global running
+    '''global counter
+    index = counter
+    if counter == len(secrets):
+        index = len(secrets)-1
+    messagebox.showwarning("Nice Try", secrets[index], parent=root)
+    counter = counter + 1'''
     running = False
 
 
@@ -336,8 +358,8 @@ def toggle_play(event=None):
 def resize(event):
     global width
     global height
-    width = event.width-4
-    height = event.height-4
+    width = event.width
+    height = event.height
     w.configure(width=width, height=height)
 
 #=============================  Circle Functions  ==============================
@@ -871,7 +893,20 @@ def non_physics():
         elif state == States.push:
             lines.append(Line(x, y, mouseX, mouseY, Tkinter.LAST))
         elif state == States.move:
-            pass
+            global playing, x, y
+            playing = False
+            for i in shapeToMove:
+                collisions = circle_invalid(shapes[i])
+                collisions.remove(shapes[i])
+                if len(collisions) == 0:
+                    shapes[i].coords = Vector2D(mouseX, mouseY)
+                    x, y = mouseX, mouseY
+                else:
+                    dist = line_length(Vector2D(mouseX, mouseY), collisions[0].coords)
+                    if dist >= line_length(shapes[i].coords, collisions[0].coords):
+                        shapes[i].coords = Vector2D(mouseX, mouseY)
+                    else:
+                        shapes[i].coords = Vector2D(x, y)
 
 
 '''
@@ -1044,12 +1079,12 @@ root.bind("<Motion>", motion)
 root.bind(shortcuts["delete"], set_delete)
 root.bind(shortcuts["create"], set_create)
 root.bind(shortcuts["push"], set_push)
-root.bind("<Configure>", resize)
 root.bind(shortcuts["pause"], toggle_play)
+root.bind("<Configure>", resize)
 root.bind("<ButtonRelease-3>", right_click)
-# root.bind("t", test)
+#root.bind("t", test)
 root.protocol("WM_DELETE_WINDOW", destroy)
-w = Tkinter.Canvas(root, width=width, height=height, )
+w = Tkinter.Canvas(root, width=width, height=height, bd=0, highlightthickness=0)
 w.pack()
 menu = Tkinter.Menu(root)
 fileMenu = Tkinter.Menu(menu, tearoff=0)
