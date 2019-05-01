@@ -103,4 +103,4 @@ def comment(filename):
     f.write("".join(finalContents))
     f.close()
 
-comment("title.py")
+comment("main.pyw")

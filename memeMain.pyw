@@ -139,23 +139,23 @@ shapes = []  # where all of the circles that physics applies to are stored
 width = 1200  # width of the screen
 height = 800  # height of the screen
 noPhysicsShapes = []  # where all of the other circles will be placed
-lines = []  # where individual lines are stored, no physics is applied
-circleId = 0  # the highest circle ID currently used.
-# this is an enum of all the states that the cursor can be in
+lines = []
+mass = 10
+circleId = 0
+secrets = ["You think this is just a game?", "Getting rid of me won't be that easy.", "Keep trying all you like.",
+           "You know the definition of insanity, right?",
+           "Doing the same thing over and over and expecting different results", "Keep wasting your time"]
+counter = 0
 States = Enum("debug", "create", "delete", "push", "move", "none")
-state = States.none  # this is the current state that cursor is in.
-# this is used for communication between onclick and onrelease mouse events.
+state = States.none
 validShape = False
-click = False  # this is used for a similar purpose.
-shapeToMove = []  # again, used for communication.
-# this is used to communicate where mouse was from onclick to onrelease events
+click = False
+shapeToMove = []
+framerate = 1.0/60.0
 x = 0
 y = 0
-# this is used to store the mouse position relative to the window
 mouseX = 0
 mouseY = 0
-# this is used to store the mouse position relative to the screen (top left of
-# leftmost screen)
 globalX = 0
 globalY = 0
 active = True

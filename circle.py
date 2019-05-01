@@ -35,6 +35,9 @@ class Circle:
     density = .05
     bounciness = 500
     color = "white"
+    useTrail = False
+    trailSkip = 5
+    trailCounter = 0
 
 
     '''
@@ -53,6 +56,8 @@ class Circle:
 ********************************************************************************
     '''
     def __init__(self, coords, radius, mass, dynamic, id, color="white"):
+        self.trail = []
+        self.secretVal = 0
         self.coords = coords
         self.radius = radius
         self.mass = mass
@@ -77,6 +82,8 @@ class Circle:
 ********************************************************************************
     '''
     def __init__(self, coords, radius, dynamic, id, color="white"):
+        self.trail = []
+        self.secretVal = 0
         self.coords = coords
         self.radius = radius
         self.mass = self.density*pi*radius**2
@@ -350,7 +357,7 @@ class Circle:
 
 ********************************************************************************
     '''
-    def frame(self, shapes, exclude, width, height):
+    def frame(self, shapes, exclude, width, height, trail_length):
         #self.move()
         collisions = []
         collisionPoints = []
@@ -373,6 +380,16 @@ class Circle:
         if len(collisions) == 0 and self.checkNearestEdge(width, height):
             #self.velocity.y += 0.05
             pass
+        if self.useTrail:
+            while len(self.trail)>trail_length:
+                self.trail.pop()
+            else:
+                if self.trailCounter == self.trailSkip:
+                    self.trail.insert(0, self.coords)
+                    self.trailCounter = 0
+                else:
+                    self.trailCounter += 1
+
         return shapes
 
 
