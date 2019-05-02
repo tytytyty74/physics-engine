@@ -135,6 +135,7 @@ defaultJson = '''{
    "push":"<p>",
    "pause":"<space>"
 }'''
+framerate = 1.0/60.0  # determines the number of seconds per frame.
 shapes = []  # where all of the circles that physics applies to are stored
 width = 1200  # width of the screen
 height = 800  # height of the screen
@@ -158,57 +159,23 @@ mouseY = 0
 # leftmost screen)
 globalX = 0
 globalY = 0
-active = True
-running = True
-color = "white"
-showVel = False
-trail_length = 10
-trail_states = Enum("gay", "lesbian", "bi", "trans", "ace", "pan", "normal", "lgbt")
-trailState = trail_states.normal
-flags = [
-    ["#d40606", "#ee9c00", "#e3ff00", "#06bf00", "#001a98"],  #gay
-    ["#a40061", "#b75592", "#ececea", "#c44e55", "#8a1e04"],  #lesbian
-    ["#D60270", "#D60270", "#9B4F96", "#0038A8", "#0038A8"],  #bi
-    ["#5bcefa", "#f5a9b8", "#ffffff", "#f5a9b8", "#5bcefa"],  #trans
-    ["#000000", "#a3a3a3", "#ffffff", "#800080", "#000000"],  #ace
-    ["#ff218e", "#ff218e", "#fcd800", "#0194fc", "#0194fc"]   #pan
-         ]
+playing = True  # whether or not the simulation is playing
+running = True  # whether or not the program should be running
+color = "white"  # default color for circles.
+showVel = False  # whether to show velocities or not
+trail_length = 10  # default length of the trail, if trails are turned on.
+
 
 #=================================  functions  =================================
 
 #=============================  state controllers  =============================
-'''
-********************************************************************************
-
-    Function: setTrailState
-
-    Definition:
-
-    Author: Tyler Silva
-
-    Date: 5-1-2019
-
-    History:
-
-********************************************************************************
-'''
-def setTrailState():
-    x = simpledialog.askstring("Secret", "Enter Secret Code")
-    if x in trail_states.dic.keys():
-        global trailState
-        trailState = trail_states[x]
-        print ("success")
-    else:
-        print("state doesn't exist")
-
-
 
 '''
 ********************************************************************************
 
     Function: ToggleVelocities
 
-    Definition:
+    Definition: Toggles whether or not velocities are shown.
 
     Author: Tyler Silva
 
@@ -227,7 +194,7 @@ def ToggleVelocities():
 
     Function: set_create
 
-    Definition:
+    Definition: Sets the cursor state to create 
 
     Author: Tyler Silva
 
@@ -247,7 +214,7 @@ def set_create(*args):
 
     Function: set_push
 
-    Definition:
+    Definition: Sets the cursor state to push
 
     Author: Tyler Silva
 
@@ -267,7 +234,7 @@ def set_push(*args):
 
     Function: set_delete
 
-    Definition:
+    Definition: Sets the cursor state to delete
 
     Author: Tyler Silva
 
@@ -287,7 +254,7 @@ def set_delete(*args):
 
     Function: debug
 
-    Definition:
+    Definition: Sets the cursor state to debug
 
     Author: Tyler Silva
 
@@ -307,7 +274,7 @@ def debug(*args):
 
     Function: set_move
 
-    Definition:
+    Definition: Sets the cursor state to move
 
     Author: Tyler Silva
 
@@ -327,7 +294,7 @@ def set_move(*args):
 
     Function: startTrail
 
-    Definition:
+    Definition: sets the shape that was clicked on to leave a trail.
 
     Author: Tyler Silva
 
@@ -349,7 +316,8 @@ def startTrail(circles):
 
     Function: test
 
-    Definition:
+    Definition: Generic function i can use for testing things, changes often and
+                rarely kept here. disabled for public tests.
 
     Author: Tyler Silva
 
@@ -360,7 +328,7 @@ def startTrail(circles):
 ********************************************************************************
 '''
 def test(event=None):
-    root.overrideredirect(True)
+    '''root.overrideredirect(True)
     #root.geometry("+250+250")
     root.lift()
     root.wm_attributes("-topmost", True)
@@ -372,7 +340,12 @@ def test(event=None):
     root.unbind(shortcuts["push"])
     root.unbind(shortcuts["pause"])
     root.attributes("-fullscreen", True)
-#    root.wm_attributes("-transparentcolor", "black")
+#    root.wm_attributes("-transparentcolor", "black")'''
+    retval = Vector2D(0.0, 0.0)
+    for i in shapes:
+        retval += i.velocity
+    print (retval.x + retval.y)
+
 
 
 '''
@@ -380,7 +353,9 @@ def test(event=None):
 
     Function: destroy
 
-    Definition:
+    Definition: Closes the window safely, so there isn't an error. it takes 
+                *args so that it can be called from keypress or click of a 
+                button, as a keypress passes the "event" argument
 
     Author: Tyler Silva
 
@@ -392,12 +367,6 @@ def test(event=None):
 '''
 def destroy(*args):
     global running
-    '''global counter
-    index = counter
-    if counter == len(secrets):
-        index = len(secrets)-1
-    messagebox.showwarning("Nice Try", secrets[index], parent=root)
-    counter = counter + 1'''
     running = False
 
 
@@ -406,7 +375,8 @@ def destroy(*args):
 
     Function: motion
 
-    Definition:
+    Definition: This event is called on the motion of the mouse. It saves the 
+                local and global mouse position to the correct global variables.
 
     Author: Tyler Silva
 
@@ -427,7 +397,7 @@ def motion(event):
 
     Function: toggle_play
 
-    Definition:
+    Definition: Toggles whether the simulation is playing or not.
 
     Author: Tyler Silva
 
@@ -447,7 +417,9 @@ def toggle_play(event=None):
 
     Function: resize
 
-    Definition:
+    Definition: This event is called on the window being resized, among other 
+                things, but i'm using it only to handle resizing of the window. 
+                When the window is resized, the canvas is also changed to take up the entire screen.
 
     Author: Tyler Silva
 
@@ -470,7 +442,7 @@ def resize(event):
 
     Function: precise_circle
 
-    Definition:
+    Definition: creates a precise circle at a given point, using 
 
     Author: Tyler Silva
 
@@ -481,25 +453,38 @@ def resize(event):
 ********************************************************************************
 '''
 def precise_circle():
-    x = simpledialog.askinteger("Coords", "X coordinate", minvalue=0, maxvalue=width, parent=root)
-    y = simpledialog.askinteger("Coords", "Y coordinate", minvalue=0, maxvalue=height, parent=root, initialvalue=300)
-    radius = simpledialog.askinteger("Radius", "Radius", parent=root, minvalue=3, initialvalue=50)
-    Vx = simpledialog.askfloat("Velocity", "X Velocity", minvalue=0, parent=root, initialvalue=0)
-    Vy = simpledialog.askfloat("Velocity", "Y Velocity", minvalue=0, parent=root, initialvalue=0)
-    if not (x is None or y is None or radius is None or Vx is None or Vy is None):
+    # Gets the x coordinate to place the circle at
+    x = simpledialog.askinteger("Coords", "X coordinate", minvalue=0,
+                                maxvalue=width, parent=root)
+    # Gets the y coordinate to place the circle at
+    y = simpledialog.askinteger("Coords", "Y coordinate", minvalue=0,
+                                maxvalue=height, parent=root, initialvalue=300)
+    # Gets the radius to make the circle.
+    radius = simpledialog.askinteger("Radius", "Radius", parent=root,
+                                     minvalue=3, initialvalue=50)
+    # Gets the x velocity to make the circle move at
+    Vx = simpledialog.askfloat("Velocity", "X Velocity", minvalue=0,
+                               parent=root, initialvalue=0)
+    # Gets the y velocity to make the circle move at
+    Vy = simpledialog.askfloat("Velocity", "Y Velocity", minvalue=0,
+                               parent=root, initialvalue=0)
+    # If all popups got an answer
+    if not (x is None or y is None or radius is None or Vx is None or Vy is None
+    ):
         global circleId
+        # Create a circle object, with the x, y, and radius defined earlier.
         retval = Circle(Vector2D(x, y), radius, True, circleId, color=color)
-        retval.secretVal = randint(0, len(flags)-1)
         # retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
-        vel = Vector2D(Vx, Vy)
+        vel = Vector2D(Vx, Vy)  # set velocity to what was defined earlier.
         retval.velocity = vel
         collision = circle_invalid(retval, 2)
-        if len(collision) > 0:
-            messagebox.showinfo("Error", "Cannot place a circle, position requested is obstructed.",
-                                icon="error", parent=temp)
+        if len(collision) > 0:  # if the circle can be placed there
+            messagebox.showinfo("Error", "Cannot place a circle, position "
+                                         "requested is obstructed.",
+                                icon="error", parent=temp)  # tell the user no
         else:
             circleId += 1
-            shapes.append(retval)
+            shapes.append(retval)  # add circle to array of circles.
 
 
 
@@ -509,7 +494,8 @@ def precise_circle():
 
     Function: circle_at_pos
 
-    Definition:
+    Definition: Checks if there is a circle at the given x and y value. returns 
+                the circle object
 
     Author: Tyler Silva
 
@@ -522,6 +508,8 @@ def precise_circle():
 def circle_at_pos(x, y):
     retval = []
     for i in shapes:
+        # if the distance from where the circle is to the point it's checking is
+        # is less than the radius of the circle
         if abs(line_length(Vector2D(x, y), i.coords))<i.radius:
             retval.append(i)
     return retval
@@ -531,7 +519,8 @@ def circle_at_pos(x, y):
 
     Function: circle_at_pos2
 
-    Definition:
+    Definition: Checks if there is a circle at the given x and y value. returns 
+                the index where the circle object is object
 
     Author: Tyler Silva
 
@@ -544,6 +533,8 @@ def circle_at_pos(x, y):
 def circle_at_pos2(x, y):
     retval = []
     for i in range(0, len(shapes)):
+        # if the distance from where the circle is to the point it's checking is
+        # is less than the radius of the circle
         if abs(line_length(Vector2D(x, y), shapes[i].coords))<shapes[i].radius:
             retval.append(i)
     return retval
@@ -554,7 +545,8 @@ def circle_at_pos2(x, y):
 
     Function: circle_invalid
 
-    Definition:
+    Definition: Checks to see if a circle is able to be placed where it 
+                currently is, without colliding with any other circles.
 
     Author: Tyler Silva
 
@@ -567,7 +559,10 @@ def circle_at_pos2(x, y):
 def circle_invalid(circle, error=10):
     retval = []
     for i in shapes:
-        if line_length(circle.coords, i.coords)<= (circle.radius+i.radius)+error:
+        # If the distance from one circle's center to another circle's center is
+        # greater than the sum of their radii
+        if line_length(circle.coords, i.coords
+                       )<= (circle.radius+i.radius)+error:
             retval.append(i)
     return retval
 
@@ -577,7 +572,10 @@ def circle_invalid(circle, error=10):
 
     Function: max_radius
 
-    Definition:
+    Definition: This takes a point, a desired radius, and the circle that causes
+                the desired radius to be a problem. it then uses that 
+                information to get the largest possible radius the circle can 
+                have while still not touching anything. 
 
     Author: Tyler Silva
 
@@ -588,13 +586,18 @@ def circle_invalid(circle, error=10):
 ********************************************************************************
 '''
 def max_radius(coords, radius, collision):
-    closest = collision[0]
+    closest = collision[0]  # assumes that the closest one is the first one.
     smallestdist=line_length(coords, collision[0].coords)-collision[0].radius
     for i in collision:
+        # if another is closer
         if line_length(coords, i.coords)-i.radius<smallestdist:
+            # set that to be the smallest
             smallestdist=line_length(coords, i.coords)-i.radius
             closest=i
+    # get the distance to closeset circle
     distance = line_length(coords, closest.coords)
+    # The distance to the nearest circle minus that circle's radius is the
+    # closest it can get. subtract 10 just in case.
     retval = distance-closest.radius-10
     return min(retval, radius)
 
@@ -604,7 +607,8 @@ def max_radius(coords, radius, collision):
 
     Function: delete_shapes
 
-    Definition:
+    Definition: Deletes a circle from the array, and then re-id's them, so that 
+                none of the Ids are missing.
 
     Author: Tyler Silva
 
@@ -628,7 +632,7 @@ def delete_shapes(index):
 
     Function: to_delete
 
-    Definition:
+    Definition: Checks if the shape is completely off the screen.
 
     Author: Tyler Silva
 
@@ -639,8 +643,10 @@ def delete_shapes(index):
 ********************************************************************************
 '''
 def to_delete(shape):
-    return shape.coords.x +shape.radius < 0 or shape.coords.x -shape.radius > width or \
-        shape.coords.y + shape.radius < 0 or shape.coords.y - shape.radius > height
+    return (shape.coords.x + shape.radius < 0 or
+            shape.coords.x - shape.radius > width or
+            shape.coords.y + shape.radius < 0 or
+            shape.coords.y - shape.radius > height)
 
 
 '''
@@ -648,7 +654,8 @@ def to_delete(shape):
 
     Function: newCircle
 
-    Definition:
+    Definition: Creates a new circle, if someone tries to create a circle with a 
+                radius too small to be used.
 
     Author: Tyler Silva
 
@@ -659,19 +666,23 @@ def to_delete(shape):
 ********************************************************************************
 '''
 def newCircle(xVal, yVal):
-    radius = simpledialog.askinteger("Radius", "What should the radius be?", parent=root, minvalue=3)
-    if radius is not None:
+    radius = simpledialog.askinteger("Radius", "What should the radius be?",
+                                     parent=root, minvalue=3)
+    if radius is not None:  # if something was enetered in the popup
         global circleId
-        retval = Circle(Vector2D(xVal, yVal), radius, True, circleId,color=color)
-        retval.secretVal = randint(0, len(flags)-1)
+        # creates a circle where the mouse was, with the radius from the popup.
+        retval = Circle(Vector2D(xVal, yVal), radius, True, circleId,
+                        color=color)
         # retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
         retval.velocity = Vector2D(0, 0)
-        collision = circle_invalid(retval)
+        collision = circle_invalid(retval)  # check if a circle fits there.
         if len(collision)>0:
+            # make the radius smaller if it can't fit where it was attempted to
+            # be placed
             retval.radius = max_radius(retval.coords, retval.radius, collision)
         if retval.radius > 3:
             circleId += 1
-            shapes.append(retval)
+            shapes.append(retval) #create the circle
 
 
 '''
@@ -679,7 +690,7 @@ def newCircle(xVal, yVal):
 
     Function: changeColor
 
-    Definition:
+    Definition: Changes the color of a cirlce.
 
     Author: Tyler Silva
 
@@ -691,9 +702,10 @@ def newCircle(xVal, yVal):
 '''
 def changeColor(change):
     global shapes
+    # Gets the color to change to
     newColor = (colorchooser.askcolor(title="Pick a new color", parent=root))
     for i in change:
-        shapes[i].color = newColor[1]
+        shapes[i].color = newColor[1] #changes the color, using the hex value
 
 
 '''
@@ -701,7 +713,7 @@ def changeColor(change):
 
     Function: stop
 
-    Definition:
+    Definition: Stops a circle at a position
 
     Author: Tyler Silva
 
@@ -714,7 +726,7 @@ def changeColor(change):
 def stop(circles):
     global shapes
     for i in circles:
-        shapes[i].velocity = Vector2D(0.0, 0.0)
+        shapes[i].velocity = Vector2D(0.0, 0.0) #sets the velocity to 0
 
 #========================  File Manipulation Functions  ========================
 
@@ -723,7 +735,7 @@ def stop(circles):
 
     Function: saveShapes
 
-    Definition:
+    Definition: Saves the shapes file to a location of the user's choice.
 
     Author: Tyler Silva
 
@@ -734,11 +746,14 @@ def stop(circles):
 ********************************************************************************
 '''
 def saveShapes():
-    fileName = filedialog.asksaveasfilename(parent=root, title="Save As", filetypes=[("Saved Shapes File", "*.p")],
+    # asks the user where to save the file to
+    fileName = filedialog.asksaveasfilename(parent=root, title="Save As",
+                                            filetypes=[("Saved Shapes File",
+                                                        "*.p")],
                                             defaultextension="p")
-    if not fileName == "":
-        f = open(fileName, "wb")
-        pickle.dump(shapes, f)
+    if not fileName == "":  # if user entered something
+        f = open(fileName, "wb")  # open the file
+        pickle.dump(shapes, f)  # save the shapes to the file
         f.close()
 
 
@@ -747,7 +762,7 @@ def saveShapes():
 
     Function: loadShapes
 
-    Definition:
+    Definition: Loads the shapes from a file of the user's choice
 
     Author: Tyler Silva
 
@@ -758,12 +773,15 @@ def saveShapes():
 ********************************************************************************
 '''
 def loadShapes():
-    fileName = filedialog.askopenfilename(parent=root, title="Load", filetypes=[("Saved Shapes File", "*.p")],
+    # gets the file directory of the file to load from the user
+    fileName = filedialog.askopenfilename(parent=root, title="Load",
+                                          filetypes=[("Saved Shapes File",
+                                                      "*.p")],
                                           defaultextension="p")
-    if not fileName == "":
+    if not fileName == "": #if the user provided a file name
         global shapes
         f = open(fileName, "rb")
-        shapes = pickle.load(f)
+        shapes = pickle.load(f)  # put the contents of the file into the
         f.close()
 
 #===========================  Menu Making Functions  ===========================
@@ -773,7 +791,8 @@ def loadShapes():
 
     Function: right_click
 
-    Definition:
+    Definition: This is the handler for when the right mouse button is pressed. 
+                it opens a new menu for all these options
 
     Author: Tyler Silva
 
@@ -785,18 +804,26 @@ def loadShapes():
 '''
 def right_click(event):
     global playing
-    playing = False
+    playing = False  # stops the simulation from running
+    # finds the circles that were clicked, if any.
     clicked = circle_at_pos2(event.x, event.y)
-    if len(clicked)==0:
+    if len(clicked)==0:  # if none were clicked
+        # create menu with 1 option, create a new circle.
         emptySpotMenu = Tkinter.Menu(tearoff=0)
-        emptySpotMenu.add_command(label="New Circle", command=lambda: newCircle(event.x, event.y))
+        emptySpotMenu.add_command(label="New Circle",
+                                  command=lambda: newCircle(event.x, event.y))
         emptySpotMenu.post(globalX, globalY)
     else:
+        # creates a new menu with many options, related to the circle clicked.
         rightClickMenu = Tkinter.Menu()
-        rightClickMenu.add_command(label="Delete Circle", command=lambda: delete_shapes(clicked))
-        rightClickMenu.add_command(label="Change Color", command=lambda: changeColor(clicked))
-        rightClickMenu.add_command(label="Stop Shape", command=lambda: stop(clicked))
-        rightClickMenu.add_command(label="Add Trail", command=lambda: startTrail(clicked))
+        rightClickMenu.add_command(label="Delete Circle",
+                                   command=lambda: delete_shapes(clicked))
+        rightClickMenu.add_command(label="Change Color",
+                                   command=lambda: changeColor(clicked))
+        rightClickMenu.add_command(label="Stop Shape",
+                                   command=lambda: stop(clicked))
+        rightClickMenu.add_command(label="Add Trail",
+                                   command=lambda: startTrail(clicked))
         rightClickMenu.post(globalX, globalY)
 
 
@@ -805,7 +832,8 @@ def right_click(event):
 
     Function: shortcutMenu
 
-    Definition:
+    Definition: this creates a menu that is used to change the keyboard 
+                shortcuts
 
     Author: Tyler Silva
 
@@ -816,11 +844,11 @@ def right_click(event):
 ********************************************************************************
 '''
 def shortcutMenu():
-
-    buttons = []
+    buttons = []  # array storing the
+    # the diffrent functions of the buttons
     shortcutStates = Enum("create", "delete", "push", "pause", "none")
-    currentState = shortcutStates.none
-    currentIndex = 10
+    currentState = shortcutStates.none  # the function currently being changed
+    currentIndex = 10  # used to get the name instead of an integer.
 
 
     '''
@@ -828,7 +856,7 @@ def shortcutMenu():
 
     Function: resetShortcuts
 
-    Definition:
+    Definition: resets the shortcuts file back to the default file.
 
     Author: Tyler Silva
 
@@ -855,7 +883,9 @@ def shortcutMenu():
 
     Function: activateButton
 
-    Definition:
+    Definition: sets the state variables to match the most recent button 
+                pressed. this function is the callback of the buttons pressed to 
+                change the keyboard shortcuts.
 
     Author: Tyler Silva
 
@@ -878,7 +908,9 @@ def shortcutMenu():
 
     Function: changeVal
 
-    Definition:
+    Definition: This is the callback from any key being pressed, and tests to 
+                see if the new key can be used as a keyboard shortcut, and if it
+                then it makes the new keyboard shortcut.
 
     Author: Tyler Silva
 
@@ -893,7 +925,12 @@ def shortcutMenu():
         global currentIndex
         global currentState
         # global buttons
+        # change button text to the button that was just pressed
         buttons[currentIndex].config(text=event.keysym)
+        # try binding and unbinding the key, while adding <> around it.
+        # if the button does not exist, then it will move on to the next catch,
+        # as tkinter will throw an error. if it works, then write the shortcut
+        # to the shortcuts file.
         try:
             newRoot.bind("<" + event.keysym + ">", test)
             newRoot.unbind("<" + event.keysym + ">")
@@ -903,6 +940,8 @@ def shortcutMenu():
             json.dump(shortcuts, f)
             f.close()
         except:
+            # does similar, and attempts to bind the key without brackets. if
+            # this works, then the key is saved to the shortcuts file.
             try:
                 newRoot.bind(event.keysym, test)
                 newRoot.unbind(event.keysym)
@@ -911,11 +950,13 @@ def shortcutMenu():
                 f = open("shortcuts.json", "w")
                 json.dump(shortcuts, f)
                 f.close()
+            # if neither work, then the program gives up, and just tells you
+            # that the key is invalid
             except:
                 messagebox.showerror("error", "not a valid key")
-
-        currentIndex=10
-        currentState=shortcutStates.none
+        # rest the states, as we're no longer listening for a button
+        currentIndex = 10
+        currentState = shortcutStates.none
 
 
     newRoot = Tkinter.Tk()
@@ -996,7 +1037,7 @@ def start_circle(event):
 ********************************************************************************
 '''
 def non_physics():
-    global noPhysicsShapes, lines, state
+    global noPhysicsShapes, lines, state, playing, x, y
     noPhysicsShapes = []
     lines = []
     for i in shapes:
@@ -1005,16 +1046,6 @@ def non_physics():
                 retval = Circle(Vector2D(i.trail[j].x, i.trail[j].y),
                                 ((float(len(i.trail))-float(j))/float(len(i.trail)))*i.radius, True, 0, color=i.color)
                 retval.velocity = Vector2D(0, 0)
-                if trailState == trail_states.lgbt:
-                    try:
-                        retval.color = flags[i.secretVal][(j % 10)/2]
-                    except:
-                        retval.color = flags[i.secretVal][0]
-                elif trailState != trail_states.normal:
-                    try:
-                        retval.color = flags[trailState][(j % 10)/2]
-                    except:
-                        retval.color = flags[trailState][0]
                 noPhysicsShapes.append(retval)
         if showVel:
             lines.append(Line(i.coords.x, i.coords.y, i.coords.x+i.velocity.x*10, i.coords.y+i.velocity.y*10, Tkinter.LAST))
@@ -1032,7 +1063,6 @@ def non_physics():
         elif state == States.push:
             lines.append(Line(x, y, mouseX, mouseY, Tkinter.LAST))
         elif state == States.move:
-            global playing, x, y
             playing = False
             for i in shapeToMove:
                 collisions = circle_invalid(shapes[i])
@@ -1077,7 +1107,6 @@ def make_circle(event):
             if validShape:
                 retval = Circle(Vector2D(x, y), line_length(Vector2D(x, y), Vector2D(event.x, event.y)), True, circleId,
                                 color=color)
-                retval.secretVal = randint(0, len(flags)-1)
                 # retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
                 retval.velocity = Vector2D(0, 0)
                 collision = circle_invalid(retval)
@@ -1223,7 +1252,7 @@ root.bind(shortcuts["push"], set_push)
 root.bind(shortcuts["pause"], toggle_play)
 root.bind("<Configure>", resize)
 root.bind("<ButtonRelease-3>", right_click)
-#root.bind("t", test)
+root.bind("t", test)
 root.protocol("WM_DELETE_WINDOW", destroy)
 w = Tkinter.Canvas(root, width=width, height=height, bd=0, highlightthickness=0)
 w.pack()
@@ -1245,7 +1274,6 @@ createMenu.add_command(label="Create Precise Circle", command=precise_circle)
 menu.add_cascade(label="Create", menu=createMenu)
 optionsMenu = Tkinter.Menu(menu, tearoff=0)
 optionsMenu.add_command(label="Show/Hide Velocities", command=ToggleVelocities)
-optionsMenu.add_command(label="Trail Secret Commands", command=setTrailState)
 menu.add_cascade(label="Options", menu=optionsMenu)
 menu.add_command(label="Pause/Play", command=toggle_play)
 root.config(menu=menu)
