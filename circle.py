@@ -35,7 +35,7 @@ class Circle:
     density = .05
     bounciness = 500
     color = "white"
-    useTrail = False
+    use_trail = False
     trailSkip = 5
     trailCounter = 0
 
@@ -380,7 +380,7 @@ class Circle:
         if len(collisions) == 0 and self.checkNearestEdge(width, height):
             #self.velocity.y += 0.05
             pass
-        if self.useTrail:
+        if self.use_trail:
             while len(self.trail)>trail_length:
                 self.trail.pop()
             else:
