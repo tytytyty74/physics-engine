@@ -2,14 +2,16 @@ from functions import *
 from math import acos, radians, pi
 
 
-
-
 '''
 ********************************************************************************
 
     Class: Circle
 
-    Definition:
+    Definition: This is the giant class that represents a circle on screen. it 
+                has a main function, frame(), which is called for every circle 
+                on every loop, many attributes for the circle such as 
+                coordinates, radius, mass, velocity, etc. read more comments for
+                 more in depth explanations.
 
     Author: Tyler Silva
 
@@ -19,33 +21,38 @@ from math import acos, radians, pi
 
 ********************************************************************************
 '''
+
+
 class Circle:
-    coords = Vector2D(0.0, 0.0)
+    coords = Vector2D(0.0, 0.0)  # where the circle is on the canvas
+    # the coordinates during the start of the frame, these aaren't updated until
+    # the end of the frame
     oldCoords = Vector2D(0.0, 0.0)
-    radius = 0
-    velocity = Vector2D(0.0, 0.0)
+    radius = 0  # radius of the circle
+    velocity = Vector2D(0.0, 0.0)  # current velocity of the circle
+    # velocity of the circle at the beginning of the frame
     oldVelocity = Vector2D(0.0, 0.0)
-    rotationForce = 0.0
-    lines = []
-    angle = 0.0
-    mass = 0.0
-    dynamic = False
-    id = 0
-    collidedWith = []
-    density = .05
-    bounciness = 500
-    color = "white"
-    use_trail = False
-    trailSkip = 5
-    trailCounter = 0
-
-
+    rotationForce = 0.0  # the angular velocity, vestigial from rectangles
+    lines = []  # the lines that make up the edges, vestigial from rectangles
+    angle = 0.0  # the angle that the shape is facing, vestigial from rectangles
+    mass = 0.0  # mass of the circle
+    dynamic = False  # whether the shape is able to move
+    id = 0  # identification integer, set incrementally
+    collidedWith = []  # array remembering what the circle has collided with.
+    density = .05  # density of the circles.
+    bounciness = 500  # bounciness of the circles, vestigial from gravity.
+    color = "white"  # color of the circle
+    use_trail = False  # whether or not to draw the trail of this circle
+    trailSkip = 5  # how many frames in between each circle in the trail
+    trailCounter = 0  # used to keep track of when to add to the trail.
     '''
 ********************************************************************************
 
     Function: __init__
 
-    Definition:
+    Definition: Creates the circle, assigns private values to their arguments. 
+                this one takes a custom mass, as opposed to assigning the mass 
+                using the radius to find the area and the denisty.
 
     Author: Tyler Silva
 
@@ -55,23 +62,24 @@ class Circle:
 
 ********************************************************************************
     '''
-    def __init__(self, coords, radius, mass, dynamic, id, color="white"):
+    def __init__(self, coords, radius, mass, dynamic, local_id, color="white"):
         self.trail = []
         self.secretVal = 0
         self.coords = coords
         self.radius = radius
         self.mass = mass
         self.dynamic = dynamic
-        self.id = id
+        self.id = local_id
         self.color = color
-
 
     '''
 ********************************************************************************
 
     Function: __init__
 
-    Definition:
+    Definition: Creates the circle, assigns private values to their arguments. 
+                this one assigns the mass using the radius to find the area and 
+                the density, as opposed to taking a custom mass 
 
     Author: Tyler Silva
 
@@ -81,23 +89,23 @@ class Circle:
 
 ********************************************************************************
     '''
-    def __init__(self, coords, radius, dynamic, id, color="white"):
+    def __init__(self, coords, radius, dynamic, local_id, color="white"):
         self.trail = []
         self.secretVal = 0
         self.coords = coords
         self.radius = radius
         self.mass = self.density*pi*radius**2
         self.dynamic = dynamic
-        self.id = id
+        self.id = local_id
         self.color = color
-    
 
     '''
 ********************************************************************************
 
     Function: _translational_collision_
 
-    Definition:
+    Definition: This function defines what happens when two circle collide, what
+                happens to their velocities.
 
     Author: Tyler Silva
 
@@ -107,26 +115,35 @@ class Circle:
 
 ********************************************************************************
     '''
-    def _translational_collision_(self, shapes, collisions, i, CoM):
-        otherCoM = shapes[collisions[i]].oldCoords
-        oldVelocity = self.velocity
-        oldVelocity2 = shapes[collisions[i]].velocity
-        '''velocityP1 = ((2 * shapes[collisions[i]].mass) / (self.mass + shapes[collisions[i]].mass))
-        velocityP1 = (((self.velocity - shapes[collisions[i]].velocity) * (CoM - otherCoM)) / float(CoM - otherCoM) ** 2)
+    def _translational_collision_(self, shapes, collisions, i):
+        # Vesitial from another type of collision calculation
+        # otherCoM = shapes[collisions[i]].oldCoords
+        old_velocity = self.velocity  # velocity at the beggining of the frame.
+        # velocity of the other shape at the beggining of the calculation.
+        old_velocity2 = shapes[collisions[i]].velocity
+        '''velocityP1 = ((2 * shapes[collisions[i]].mass) / 
+                      (self.mass + shapes[collisions[i]].mass))
+        velocityP1 = (((self.velocity - shapes[collisions[i]].velocity) * 
+                       (CoM - otherCoM)) / float(CoM - otherCoM) ** 2)
         velocityP1 = (CoM - otherCoM)'''
         '''velocity = (
                 self.oldVelocity -
                 (CoM - otherCoM)
-                * ((2 * shapes[collisions[i]].mass) / (self.mass + shapes[collisions[i]].mass))
-                * (((self.oldVelocity - shapes[collisions[i]].oldVelocity) * (CoM - otherCoM)) / float(CoM - otherCoM) ** 2)
+                * ((2 * shapes[collisions[i]].mass) / 
+                   (self.mass + shapes[collisions[i]].mass))
+                * (((self.oldVelocity - shapes[collisions[i]].oldVelocity) * 
+                    (CoM - otherCoM)) / float(CoM - otherCoM) ** 2)
         )'''
-        vX = (oldVelocity.x*(self.mass-shapes[collisions[i]].mass)+(2*shapes[collisions[i]].mass*oldVelocity2.x))/(
-            self.mass+shapes[collisions[i]].mass
+        # Velocity calculations for x and y coordinates.
+        v_x = (old_velocity.x*(self.mass-shapes[collisions[i]].mass) +
+               (2*shapes[collisions[i]].mass*old_velocity2.x))/(
+                self.mass+shapes[collisions[i]].mass
         )
-        vY = (oldVelocity.y*(self.mass-shapes[collisions[i]].mass)+(2*shapes[collisions[i]].mass*oldVelocity2.y))/(
-            self.mass+shapes[collisions[i]].mass
+        v_y = (old_velocity.y*(self.mass-shapes[collisions[i]].mass) +
+               (2*shapes[collisions[i]].mass*old_velocity2.y))/(
+                self.mass+shapes[collisions[i]].mass
         )
-        velocity = Vector2D(vX, vY)
+        velocity = Vector2D(v_x, v_y)
         self.velocity = velocity
         velocity.y *= 1
         velocity.x *= 1
@@ -135,27 +152,31 @@ class Circle:
                 shapes[collisions[i]].oldVelocity -
                 (otherCoM - CoM)
                 * ((2 * self.mass) / (self.mass + shapes[collisions[i]].mass))
-                * (((shapes[collisions[i]].oldVelocity - self.oldVelocity) * (otherCoM - CoM)) / float(otherCoM - CoM) ** 2)
+                * (((shapes[collisions[i]].oldVelocity - self.oldVelocity) * 
+                    (otherCoM - CoM)) / float(otherCoM - CoM) ** 2)
         )'''
-        vX = (oldVelocity2.x * (shapes[collisions[i]].mass - self.mass) + (
-                    2 * self.mass * oldVelocity.x)) / (
+        v_x = (old_velocity2.x * (shapes[collisions[i]].mass - self.mass) + (
+                    2 * self.mass * old_velocity.x)) / (
                      self.mass + shapes[collisions[i]].mass
              )
-        vY = (oldVelocity2.y * (shapes[collisions[i]].mass - self.mass) + (
-                    2 * self.mass * oldVelocity.y)) / (
+        v_y = (old_velocity2.y * (shapes[collisions[i]].mass - self.mass) + (
+                    2 * self.mass * old_velocity.y)) / (
                     self.mass + shapes[collisions[i]].mass
              )
-        velocity = Vector2D(vX, vY)
+        velocity = Vector2D(v_x, v_y)
         velocity.y *= 1
         velocity.x *= 1
 
         '''if velocity == Vector2D(0, 0) and self.velocity == Vector2D(0, 0):
-            self.velocity = (self.coords-shapes[collisions[i]].coords)*(1/self.radius)
-            velocity = (shapes[collisions[i]].coords-self.coords)*(1/shapes[collisions[i]].radius)'''
+            self.velocity = (self.coords-shapes[collisions[i]].coords)*\
+                            (1/self.radius)
+            velocity = (shapes[collisions[i]].coords-self.coords)*\
+                        (1/shapes[collisions[i]].radius)'''
 
         return velocity
 
-    '''def _rotational_collision_(self, shapes, collisions, collisionPoints, i, CoM, oldVelocity, oldVelocity2, otherCoM):
+    '''def _rotational_collision_(self, shapes, collisions, collisionPoints, i, 
+                               CoM, oldVelocity, oldVelocity2, otherCoM):
         #return 0
         f = (self.mass * float(self.velocity - oldVelocity)) * 60
         closeEdge = self.get_nearest_edge(collisionPoints[i])
@@ -165,7 +186,10 @@ class Circle:
             b = Vector2D(1, -maxsize)
         r = find_r(CoM, collisionPoints[i])
         bigF = b * ((r * b) / (float(b) ** 2))
-        phi = acos(((r * bigF) / (float(r) * float(bigF)) if (r * bigF) / (float(r) * float(bigF))<1 else 1))
+        phi = acos(((r * bigF) / (float(r) * float(bigF)) if (r * bigF) / 
+                                                             (float(r) * 
+                                                              float(bigF))<1
+                    else 1))
         tau = float(r) * float(bigF) * sin(phi)
         h = line_length(self.coords[0], self.coords[1])
         w = line_length(self.coords[1], self.coords[2])
@@ -174,27 +198,32 @@ class Circle:
         x = h**2+w**2
         inertia = (1.0 / 12.0) * self.mass * (h ** 2 + w ** 2)
         self.rotationForce += tau / inertia / 60
-        f = (shapes[collisions[i]].mass * float(shapes[collisions[i]].velocity - oldVelocity2)) * 60
+        f = (shapes[collisions[i]].mass * float(shapes[collisions[i]].velocity - 
+                                                oldVelocity2)) * 60
         try:
             b = Vector2D(1, 1/closeEdge.m)
         except ZeroDivisionError:
             b = Vector2D(1, -maxsize)
         r = find_r(otherCoM, collisionPoints[i])
         bigF = b * ((r * b) / (float(b)**2))
-        phi = acos(((r * bigF) / (float(r) * float(bigF)) if (r * bigF) / (float(r) * float(bigF))<1 else 1))
+        phi = acos(((r * bigF) / (float(r) * float(bigF)) if (r * bigF) / 
+                                                             (float(r) * 
+                                                              float(bigF))<1 
+                    else 1))
         tau = float(r) * float(f) * sin(phi)
-        h = line_length(shapes[collisions[i]].coords[0], shapes[collisions[i]].coords[1])
-        w = line_length(shapes[collisions[i]].coords[1], shapes[collisions[i]].coords[2])
+        h = line_length(shapes[collisions[i]].coords[0], 
+                        shapes[collisions[i]].coords[1])
+        w = line_length(shapes[collisions[i]].coords[1], 
+                        shapes[collisions[i]].coords[2])
         inertia = (1.0/12.0)*shapes[collisions[i]].mass*(h**2+w**2)
         return (tau/inertia/60)'''
-
-
     '''
 ********************************************************************************
 
     Function: move
 
-    Definition:
+    Definition: This applies the new velocity to the shape, and moves it the 
+                correct amount.
 
     Author: Tyler Silva
 
@@ -206,18 +235,23 @@ class Circle:
     '''
     def move(self):
         if self.dynamic:
-            self.coords= (self.coords + self.velocity)
+            self.coords = (self.coords + self.velocity)
         else:
             self.rotationForce = 0
             self.velocity = Vector2D(0, 0)
-    
-
     '''
 ********************************************************************************
 
     Function: check_collider
 
-    Definition:
+    Definition: Checks to see if the two circles are colliding. returns a 
+                collision object, which is just a structure used to hold a 
+                position and a boolean. the position is the point of the 
+                collision, which for circles is the midpoint of the line created 
+                with the endpoints being the centers of each circle. the boolean
+                is weather or not there is a collision, which is determined by 
+                checking if the distance between the two circles is greater than
+                the sum of their radii
 
     Author: Tyler Silva
 
@@ -228,9 +262,10 @@ class Circle:
 ********************************************************************************
     '''
     def check_collider(self, collider):
-        #return False
-        return Collision(getMidpoint(self.coords, collider.coords),
-                         line_length(self.coords, collider.coords)<= (self.radius+collider.radius))
+        # return False
+        return Collision(get_midpoint(self.coords, collider.coords),
+                         line_length(self.coords, collider.coords) <=
+                         (self.radius+collider.radius))
 
     '''def findLines(self):
         for i in range(0, 3):
@@ -245,7 +280,7 @@ class Circle:
 
     Function: get_nearest_edge
 
-    Definition:
+    Definition: Vestigial code from rectangles
 
     Author: Tyler Silva
 
@@ -260,7 +295,8 @@ class Circle:
         dists = []
         retval = 0
         for i in range(0, 3):
-            dists.append(abs(self.lines[i].m*point.x + (-point.y)+self.lines[i].b)/sqrt(self.lines[i].m**2+1))
+            dists.append(abs(self.lines[i].m*point.x + (-point.y) +
+                             self.lines[i].b)/sqrt(self.lines[i].m**2+1))
         smallest = dists[0]
         for i in range(1, 3):
             if dists[i] < smallest:
@@ -270,9 +306,11 @@ class Circle:
     '''
 ********************************************************************************
 
-    Function: getParams
+    Function: get_params
 
-    Definition:
+    Definition: Tkinter requires 2 corners, not a center point and a radius to 
+                create a new circle, so this converts a centerpoint and a radius
+                into 2 opposite corners.
 
     Author: Tyler Silva
 
@@ -282,22 +320,22 @@ class Circle:
 
 ********************************************************************************
     '''
-    def getParams(self):
-        retval =[0, 0, 0, 0]
+    def get_params(self):
+        retval = [0, 0, 0, 0]
         retval[0] = self.coords.x-self.radius
         retval[1] = self.coords.y-self.radius
         retval[2] = self.coords.x+self.radius
         retval[3] = self.coords.y+self.radius
         return retval
 
-
-
     '''
 ********************************************************************************
 
-    Function: checkNearestEdge
+    Function: check_nearest_edge
 
-    Definition:
+    Definition: this checks to see if the circle is touching an edge, and 
+                heading towards that edge. if it is, then it reverses the 
+                velocity to simulate a bounce.
 
     Author: Tyler Silva
 
@@ -307,47 +345,31 @@ class Circle:
 
 ********************************************************************************
     '''
-    def checkNearestEdge(self, width, height):
-
-        loss = min(self.bounciness/self.mass, 1)
-        #print(loss)
-        #loss = 0.2
+    def check_nearest_edge(self, width, height):
         retval = True
-        if (not (0 <= self.coords.x -self.radius) and self.velocity.x < 0) or \
-                (not (self.coords.x +self.radius <= width) and self.velocity.x > 0):
-            self.velocity.x = -self.velocity.x
+        # if (not (to the right of the left edge) and heading left) or
+        # (not (to the left of the right edge) and going right)
+        if (not (0 <= self.coords.x - self.radius) and self.velocity.x < 0)or\
+                (not (self.coords.x + self.radius <= width) and
+                 self.velocity.x > 0):
+            self.velocity.x = -self.velocity.x  # bounce
             retval = False
-        elif (not (0 <= self.coords.y -self.radius ) and self.velocity.y < 0) or \
-                (not (self.coords.y + self.radius <= height) and self.velocity.y > 0):
-            self.velocity.y = -self.velocity.y
+        # if (not (below top of screen) and going up) or (not (above top of
+        # screen) and going down)
+        elif (not (0 <= self.coords.y - self.radius) and self.velocity.y < 0)or\
+                (not (self.coords.y + self.radius <= height) and
+                 self.velocity.y > 0):
+            self.velocity.y = -self.velocity.y  # bounce
             retval = False
         return retval
-
-
-    '''
-********************************************************************************
-
-    Function: checkNearestEdge
-
-    Definition:
-
-    Author: Tyler Silva
-
-    Date: 4-29-2019
-
-    History:
-
-********************************************************************************
-    '''
-
-
 
     '''
 ********************************************************************************
 
     Function: frame
 
-    Definition:
+    Definition: This is the main function, it handles all physics and other 
+                calculations, as well as remembering coordinates for the trail.
 
     Author: Tyler Silva
 
@@ -358,32 +380,34 @@ class Circle:
 ********************************************************************************
     '''
     def frame(self, shapes, exclude, width, height, trail_length):
-        #self.move()
+        # self.move()
         collisions = []
-        collisionPoints = []
-        self.oldCoords = self.coords
-        self.oldVelocity = self.velocity
+        collision_points = []
+        self.oldCoords = self.coords  # old coords updated
+        self.oldVelocity = self.velocity  # old velocity updated
         for i in range(self.id, len(shapes)):
-            if i != exclude or i in self.collidedWith:
-                col = self.check_collider(shapes[i])
-                if col.collided:
-                    collisions.append(i)
-                    collisionPoints.append(col.collisionPoint)
-        CoM = self.coords
+            if i != exclude:
+                col = self.check_collider(shapes[i])  # check for collision
+                if col.collided:  # if there was a collision
+                    collisions.append(i)  # make note of it, then continue
+                    collision_points.append(col.collisionPoint)
+        # center_of_mass = self.coords
         for i in range(0, len(collisions)):
-            otherCoM = shapes[collisions[i]].coords
-            oldVelocity = self.velocity
-            oldVelocity2 = shapes[collisions[i]].velocity
-            shapes[collisions[i]].velocity = -self._translational_collision_(shapes, collisions, i, CoM)
-            '''shapes[collisions[i]].rotationForce += self._rotational_collision_(shapes, collisions, collisionPoints, i,
-                                                                              CoM, oldVelocity, oldVelocity2, otherCoM)'''
-        if len(collisions) == 0 and self.checkNearestEdge(width, height):
-            #self.velocity.y += 0.05
-            pass
+            # process collision
+            shapes[collisions[i]].velocity = \
+                -self._translational_collision_(shapes, collisions, i)
+            '''shapes[collisions[i]].rotationForce += \
+                self._rotational_collision_(shapes, collisions, collisionPoints, 
+                                            i, CoM, oldVelocity, oldVelocity2,  
+                                            otherCoM)'''
+        # bounce if at wall
+        self.check_nearest_edge(width, height)
+
         if self.use_trail:
-            while len(self.trail)>trail_length:
+            while len(self.trail) > trail_length:
                 self.trail.pop()
             else:
+                # if trail needs to be lengthened
                 if self.trailCounter == self.trailSkip:
                     self.trail.insert(0, self.coords)
                     self.trailCounter = 0
@@ -392,13 +416,12 @@ class Circle:
 
         return shapes
 
-
     '''
 ********************************************************************************
 
-    Function: debugPrint
+    Function: debug_print
 
-    Definition:
+    Definition: prints out info on the shape, used for debugging purposes
 
     Author: Tyler Silva
 
@@ -408,12 +431,11 @@ class Circle:
 
 ********************************************************************************
     '''
-    def debugPrint(self):
+    def debug_print(self):
         pass
-        #print ("coords: "+str(self.coords))
-        #print ("velocity: "+str(self.velocity))
-        #print ("mass: "+str(self.mass))
-
+        # print ("coords: "+str(self.coords))
+        # print ("velocity: "+str(self.velocity))
+        # print ("mass: "+str(self.mass))
 
 
 '''
@@ -421,7 +443,8 @@ class Circle:
 
     Class: Line
 
-    Definition:
+    Definition: This class is used to hold all the information that is needed 
+                for a line 
 
     Author: Tyler Silva
 
@@ -431,15 +454,15 @@ class Circle:
 
 ********************************************************************************
 '''
-class Line:
-    
 
+
+class Line:
     '''
 ********************************************************************************
 
     Function: __init__
 
-    Definition:
+    Definition: saves a few private variables.
 
     Author: Tyler Silva
 
@@ -450,19 +473,18 @@ class Line:
 ********************************************************************************
     '''
     def __init__(self, x1, y1, x2, y2, arrow):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
-        self.arrow = arrow
-
+        self.x1 = x1  # start x position
+        self.y1 = y1  # start y position
+        self.x2 = x2  # end x position
+        self.y2 = y2  # end y position
+        self.arrow = arrow  # arrow to put on the line
 
     '''
 ********************************************************************************
 
-    Function: getParams
+    Function: get_params
 
-    Definition:
+    Definition: returns the private variables in the order tkinter needs them.
 
     Author: Tyler Silva
 
@@ -472,5 +494,5 @@ class Line:
 
 ********************************************************************************
     '''
-    def getParams(self):
+    def get_params(self):
         return [self.x1, self.y1, self.x2, self.y2, self.arrow]

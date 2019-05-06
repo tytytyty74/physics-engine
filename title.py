@@ -49,7 +49,7 @@ def comment(filename):
 
     Definition:
 
-    Author: Tyler Silva
+    Author: Jeremy Patrick
 
     Date: """, """
 
@@ -64,7 +64,7 @@ def comment(filename):
 
     Definition:
 
-    Author: Tyler Silva
+    Author: Jeremy Patrick
 
     Date: """, """
 
@@ -103,4 +103,13 @@ def comment(filename):
     f.write("".join(finalContents))
     f.close()
 
-comment("main.pyw")
+print ("which file to comment")
+try:
+    x = raw_input("> ")
+except:
+    x = input("> ")
+try:
+    f=open(x)
+    f.close()
+except:
+    print ("file doesn't exist")

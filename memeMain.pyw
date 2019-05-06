@@ -662,7 +662,7 @@ def newCircle(xVal, yVal):
     radius = simpledialog.askinteger("Radius", "What should the radius be?", parent=root, minvalue=3)
     if radius is not None:
         global circleId
-        retval = Circle(Vector2D(xVal, yVal), radius, True, circleId,color=color)
+        retval = Circle(Vector2D(xVal, yVal), radius, True, circleId, color=color)
         retval.secretVal = randint(0, len(flags)-1)
         # retval.velocity = Vector2D(((random()*2)-1)*.1, ((random()*2)-1)*.1)
         retval.velocity = Vector2D(0, 0)
@@ -1003,7 +1003,7 @@ def non_physics():
         if i.useTrail:
             for j in range(0, len(i.trail)):
                 retval = Circle(Vector2D(i.trail[j].x, i.trail[j].y),
-                                ((float(len(i.trail))-float(j))/float(len(i.trail)))*i.radius, True, 0, color=i.color)
+                                ((float(len(i.trail))-float(j))/float(len(i.trail))) * i.radius, True, 0, color=i.color)
                 retval.velocity = Vector2D(0, 0)
                 if trailState == trail_states.lgbt:
                     try:
@@ -1163,14 +1163,14 @@ def main():
         w.delete("all")
         for i in shapes:
             # w.create_polygon(i[0].x, i[0].y, i[1].x, i[1].y, i[2].x, i[2].y, i[3].x, i[3].y)
-            params = i.getParams()
+            params = i.get_params()
             w.create_oval(params[0], params[1], params[2], params[3], fill=i.color)
         for i in noPhysicsShapes:
-            params = i.getParams()
+            params = i.get_params()
             temp2 = w.create_oval(params[0], params[1], params[2], params[3], fill=i.color)
             w.tag_lower(temp2)
         for i in lines:
-            params = i.getParams()
+            params = i.get_params()
             w.create_line(params[0], params[1], params[2], params[3], arrow=params[4])
         w.update()
     root.destroy()

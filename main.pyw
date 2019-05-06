@@ -1103,7 +1103,7 @@ def left_click(event):
     elif state == States.debug:
         # For every shape that was clicked on
         for j in circle_at_pos(event.x, event.y):
-            j.debugPrint()
+            j.debug_print()
 
     elif state == States.push or state == States.move:
         global shapeToMove
@@ -1332,16 +1332,16 @@ def main():
         for j in shapes:  # draws all physics related circles
             # w.create_polygon(i[0].x, i[0].y, i[1].x, i[1].y, i[2].x, i[2].y,
             #                  i[3].x, i[3].y)
-            params = j.getParams()
+            params = j.get_params()
             w.create_oval(params[0], params[1], params[2], params[3],
                           fill=j.color)
         for j in noPhysicsShapes:  # draws all other circles shapes
-            params = j.getParams()
+            params = j.get_params()
             temp2 = w.create_oval(params[0], params[1], params[2], params[3],
                                   fill=j.color)
             w.tag_lower(temp2)  # if shapes overlap, these ones go underneath
         for j in lines:  # draws all lines
-            params = j.getParams()
+            params = j.get_params()
             w.create_line(params[0], params[1], params[2], params[3],
                           arrow=params[4])
         w.update()  # updates the canvas

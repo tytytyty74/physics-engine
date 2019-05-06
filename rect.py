@@ -29,7 +29,7 @@ class Rect:
 
     
     def _translational_collision_(self, shapes, collisions, i, CoM):
-        otherCoM = getCoM(shapes[collisions[i]].coords)
+        otherCoM = get_center_of_mass(shapes[collisions[i]].coords)
         oldVelocity = self.velocity
         oldVelocity2 = shapes[collisions[i]].velocity
         velocityP1 = ((2 * shapes[collisions[i]].mass) / (self.mass + shapes[collisions[i]].mass))
@@ -74,7 +74,7 @@ class Rect:
         self.rotationForce += tau / inertia / 60
         f = (shapes[collisions[i]].mass * float(shapes[collisions[i]].velocity - oldVelocity2)) * 60
         try:
-            b = Vector2D(1, 1/closeEdge.m)
+            b = Vector2D(1, 1 / closeEdge.m)
         except ZeroDivisionError:
             b = Vector2D(1, -maxsize)
         r = find_r(otherCoM, collisionPoints[i])
@@ -92,7 +92,7 @@ class Rect:
     def move(self):
         if self.dynamic:
             for i in range(0, len(self.coords)):
-                self.coords[i] = (get_point_after_rotation(self.coords[i], getCoM(self.coords), self.rotationForce) +
+                self.coords[i] = (get_point_after_rotation(self.coords[i], get_center_of_mass(self.coords), self.rotationForce) +
                                   self.velocity)
         else:
             self.rotationForce = 0
@@ -156,9 +156,9 @@ class Rect:
                 if col.collided:
                     collisions.append(i)
                     collisionPoints.append(col.collisionPoint)
-        CoM = getCoM(self.coords)
+        CoM = get_center_of_mass(self.coords)
         for i in range(0, len(collisions)):
-            otherCoM = getCoM(shapes[collisions[i]].coords)
+            otherCoM = get_center_of_mass(shapes[collisions[i]].coords)
             oldVelocity = self.velocity
             oldVelocity2 = shapes[collisions[i]].velocity
             shapes[collisions[i]].velocity = -self._translational_collision_(shapes, collisions, i, CoM)
