@@ -31,7 +31,7 @@ from circle import *
                 in most languages.
 
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -53,7 +53,7 @@ class Enum:
                 adds them to a dictionary, with the string as the key, and an 
                 integer as the value
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -74,7 +74,7 @@ class Enum:
     Definition: this is a magic function called when enum is indexed into, ie:
                 hello["world"] would call hello.__getitem__("world")
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -95,7 +95,7 @@ class Enum:
                 from the object, ie: hello.world would call 
                 hello.__getattr__("world")
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -115,7 +115,7 @@ class Enum:
     Definition: this function is called to get the keyname of a key as a string
                 from the enum value
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 5-1-2019
 
@@ -177,7 +177,7 @@ trail_length = 10  # Default length of the trail, if trails are turned on.
 
     Definition: Toggles whether or not velocities are shown.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 5-1-2019
 
@@ -199,7 +199,7 @@ def toggle_velocities():
 
     Definition: Sets the cursor state to create 
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -223,7 +223,7 @@ def set_create(*args):
 
     Definition: Sets the cursor state to push
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -247,7 +247,7 @@ def set_push(*args):
 
     Definition: Sets the cursor state to delete
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -271,7 +271,7 @@ def set_delete(*args):
 
     Definition: Sets the cursor state to debug
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -295,7 +295,7 @@ def debug(*args):
 
     Definition: Sets the cursor state to move
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -319,7 +319,7 @@ def set_move(*args):
 
     Definition: sets the shape that was clicked on to leave a trail.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 5-1-2019
 
@@ -346,7 +346,7 @@ def start_trail(circles):
     Definition: Generic function i can use for testing things, changes often and
                 rarely kept here. Disabled for public tests.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -387,7 +387,7 @@ def test(event=None):
                 *args so that it can be called from keypress or click of a 
                 button, as a keypress passes the "event" argument
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -412,7 +412,7 @@ def destroy(*args):
     Definition: This event is called on the motion of the mouse. It saves the 
                 local and global mouse position to the correct global variables.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -436,7 +436,7 @@ def motion(event):
 
     Definition: Toggles whether the simulation is playing or not.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -463,7 +463,7 @@ def toggle_play(event=None):
                 When the window is resized, the canvas is also changed to take 
                 up the entire screen.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -489,7 +489,7 @@ def resize(event):
 
     Definition: creates a precise circle at a given point, using 
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 5-1-2019
 
@@ -544,7 +544,7 @@ def precise_circle():
     Definition: Checks if there is a circle at the given x and y value. Returns 
                 the circle object
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -572,7 +572,7 @@ def circle_at_pos(local_x, local_y):
     Definition: Checks if there is a circle at the given x and y value. Returns 
                 the index where the circle object is object
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -601,7 +601,7 @@ def circle_at_pos2(local_x, local_y):
     Definition: Checks to see if a circle is able to be placed where it 
                 currently is, without colliding with any other circles.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -632,7 +632,7 @@ def circle_invalid(circle, error=10):
                 information to get the largest possible radius the circle can 
                 have while still not touching anything. 
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -668,7 +668,7 @@ def max_radius(coords, radius, collision):
     Definition: Deletes a circle from the array, and then re-id's them, so that 
                 none of the Ids are missing.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -694,7 +694,7 @@ def delete_shapes(index):
 
     Definition: Checks if the shape is completely off the screen.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -719,7 +719,7 @@ def to_delete(shape):
     Definition: Creates a new circle, if someone tries to create a circle with a 
                 radius too small to be used.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -756,7 +756,7 @@ def new_circle(x_val, y_val):
 
     Definition: Changes the color of a cirlce.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -781,7 +781,7 @@ def change_color(change):
 
     Definition: Stops a circle at a position
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -806,7 +806,7 @@ def stop(circles):
 
     Definition: Saves the shapes file to a location of the user's choice.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -835,7 +835,7 @@ def save_shapes():
 
     Definition: Loads the shapes from a file of the user's choice
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -868,7 +868,7 @@ def load_shapes():
     Definition: This is the handler for when the right mouse button is pressed. 
                 it opens a new menu for all these options
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -912,7 +912,7 @@ def right_click(event):
     Definition: this creates a menu that is used to change the keyboard 
                 shortcuts
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -936,7 +936,7 @@ def shortcut_menu():
 
     Definition: resets the shortcuts file back to the default file.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -965,7 +965,7 @@ def shortcut_menu():
                 pressed. This function is the callback of the buttons pressed to 
                 change the keyboard shortcuts.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -990,7 +990,7 @@ def shortcut_menu():
                 see if the new key can be used as a keyboard shortcut, and if it
                 then it makes the new keyboard shortcut.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -1074,7 +1074,7 @@ def shortcut_menu():
                 pressed. For the most part, it just records data on what was 
                 clicked on.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -1124,7 +1124,7 @@ def left_click(event):
                 attempts to push a circle, and creating a line to show the 
                 circle velocities
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -1212,7 +1212,7 @@ def non_physics():
                 button. it checks the state of the cursor, and uses global 
                 information to create, delete, or push a shape.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -1284,7 +1284,7 @@ def release_click(event):
                 the drawing to the canvas. it also regulates the framerate to a
                 maximum of 60 fps.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 

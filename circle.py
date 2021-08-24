@@ -13,7 +13,7 @@ from math import acos, radians, pi
                 coordinates, radius, mass, velocity, etc. read more comments for
                  more in depth explanations.
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -54,7 +54,7 @@ class Circle:
                 this one takes a custom mass, as opposed to assigning the mass 
                 using the radius to find the area and the denisty.
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -81,7 +81,7 @@ class Circle:
                 this one assigns the mass using the radius to find the area and 
                 the density, as opposed to taking a custom mass 
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -107,7 +107,7 @@ class Circle:
     Definition: This function defines what happens when two circle collide, what
                 happens to their velocities.
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -225,7 +225,7 @@ class Circle:
     Definition: This applies the new velocity to the shape, and moves it the 
                 correct amount.
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -253,7 +253,7 @@ class Circle:
                 checking if the distance between the two circles is greater than
                 the sum of their radii
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -282,7 +282,7 @@ class Circle:
 
     Definition: Vestigial code from rectangles
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -312,7 +312,7 @@ class Circle:
                 create a new circle, so this converts a centerpoint and a radius
                 into 2 opposite corners.
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -337,7 +337,7 @@ class Circle:
                 heading towards that edge. if it is, then it reverses the 
                 velocity to simulate a bounce.
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -371,7 +371,7 @@ class Circle:
     Definition: This is the main function, it handles all physics and other 
                 calculations, as well as remembering coordinates for the trail.
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -423,7 +423,7 @@ class Circle:
 
     Definition: prints out info on the shape, used for debugging purposes
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -446,7 +446,7 @@ class Circle:
     Definition: This class is used to hold all the information that is needed 
                 for a line 
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -464,7 +464,7 @@ class Line:
 
     Definition: saves a few private variables.
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 
@@ -486,7 +486,7 @@ class Line:
 
     Definition: returns the private variables in the order tkinter needs them.
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-29-2019
 

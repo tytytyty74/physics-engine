@@ -9,7 +9,7 @@ from math import sqrt, cos, sin, radians
     Definition: This class is meant to represent a 2 dimensional Vector, using 
                 X, Y; as opposed to angle, magnitude
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-5-2019
 
@@ -30,7 +30,7 @@ class Vector2D:
 
     Definition: stores X and Y coordinates to the private variables
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-5-2019
 
@@ -50,7 +50,7 @@ class Vector2D:
     Definition: String representation of the vector, returns the values to look 
                 like "(X, Y)"
 
-    Author: Tyler Silva
+    Author: Ty Silva
 
     Date: 4-5-2019
 
@@ -69,7 +69,7 @@ class Vector2D:
     Definition: this is what is called when you attempt to convert the vector to
                 a float. i'm using it to easily find the magnitude of the vector
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -89,7 +89,7 @@ class Vector2D:
                 vector, ie: x[0]. it returns the x value if you ask for the 0th 
                 index, and the y value if you ask for the 1st index
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -116,7 +116,7 @@ class Vector2D:
                 it is, it makes a new vector with the x and y values of the 
                 other two vectors summed.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -140,7 +140,7 @@ class Vector2D:
                     on an array. if the other object is an array, and the x and
                     y values are the same, then it will return true.
 
-        Author: Tyler Silva
+        Author: ty Silva
 
         Date: 4-5-2019
 
@@ -163,7 +163,7 @@ class Vector2D:
                 a vector. if the other thing is a vector, then it subtracts
                 the x and y values of each vector, and puts it into a new vector
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -188,7 +188,7 @@ class Vector2D:
                 x and y values by that constant. if the other thing is a vector, 
                 then it finds the dot product of the two.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -215,7 +215,7 @@ class Vector2D:
     Definition: This function is called when you want to get the negative of the
                 vector. it multiplies the vector by -1
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -235,7 +235,7 @@ class Vector2D:
     Definition: simple structure used to store the location of a collision, and 
                 where the collision occurred.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -256,7 +256,7 @@ class Collision:
 
     Definition: saves arguments to private variables. 
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -276,7 +276,7 @@ class Collision:
 
     Definition: gets the midpoint of two lines, using the midpoint formula
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -297,7 +297,7 @@ def get_midpoint(a, b):
 
     Definition: gets the area of a triangle made by 3 vectors
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -318,7 +318,7 @@ def triangle_area(a, b, c):
 
     Definition: gets the length of a line, made by 2 vectors
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -339,7 +339,7 @@ def line_length(a, b):
 
     Definition: gets the center of mass of a rectangle, given it's coordinates
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -361,7 +361,7 @@ def get_center_of_mass(coords):
 
     Definition: finds the radius of a square in a collision
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
@@ -383,7 +383,7 @@ def find_r(center_of_mass, point):
     Definition: takes the position of a square and the amount to rotate it by. 
                 returns the new coordinates.
 
-    Author: Tyler Silva
+    Author: ty Silva
 
     Date: 4-5-2019
 
